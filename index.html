@@ -1,0 +1,2623 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="토익단어">
+<meta name="theme-color" content="#F2F4F8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1320" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>토익 단어 암기</title>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap">
+<style>
+/* Layout: one-screen phone app. Study = header strip / question half / tap-to-reveal half / O·X / tab bar. Highlighter-on-vocab-book identity. */
+:root{
+  --paper:#F2F4F8; --card:#FFFFFF; --sunk:#E8ECF2; --ink:#17223A; --muted:#5D6A82; --line:#DCE1EA;
+  --hl:#FFE14D; --hl-soft:rgba(255,225,77,.55); --primary:#17223A; --on-primary:#FFFFFF;
+  --ok:#1E9A68; --no:#DD4A41; --word:#2D5FCC; --ex:#B0601A; --word-bg:rgba(45,95,204,.10); --ex-bg:rgba(176,96,26,.11);
+  --shadow:0 1px 2px rgba(23,34,58,.06),0 8px 24px rgba(23,34,58,.07);
+  --f-en:"Newsreader",Georgia,"Times New Roman",serif;
+  --f-ui:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --r:18px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0D1320; --card:#161F31; --sunk:#111929; --ink:#E8ECF4; --muted:#93A0B7; --line:#26324A;
+  --hl:#E9CF45; --hl-soft:rgba(233,207,69,.42); --primary:#E9CF45; --on-primary:#1A1606;
+  --ok:#35C189; --no:#FF6A61; --word:#82A8FF; --ex:#F0A25B; --word-bg:rgba(130,168,255,.14); --ex-bg:rgba(240,162,91,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.28); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0D1320; --card:#161F31; --sunk:#111929; --ink:#E8ECF4; --muted:#93A0B7; --line:#26324A;
+  --hl:#E9CF45; --hl-soft:rgba(233,207,69,.42); --primary:#E9CF45; --on-primary:#1A1606;
+  --ok:#35C189; --no:#FF6A61; --word:#82A8FF; --ex:#F0A25B; --word-bg:rgba(130,168,255,.14); --ex-bg:rgba(240,162,91,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.28); color-scheme:dark}
+
+html{height:100%;box-sizing:border-box}
+*,*::before,*::after{box-sizing:border-box}
+body{height:100%;background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.5;-webkit-tap-highlight-color:transparent;overflow:hidden}
+button,input,textarea{font:inherit;color:inherit}
+button{touch-action:manipulation;cursor:pointer;border:0;background:none;padding:0}
+:focus-visible{outline:2px solid var(--word);outline-offset:2px}
+
+.app{height:100%;display:flex;flex-direction:column;max-width:560px;margin:0 auto}
+.screen{flex:1;min-height:0;display:flex;flex-direction:column}
+.scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 16px 24px}
+
+/* ---------- tab bar ---------- */
+.tabs{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border-top:1px solid var(--line);background:var(--card);padding:6px 8px 4px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;color:var(--muted);font-size:11px;font-weight:600}
+.tab svg{width:24px;height:24px}
+.tab[aria-selected="true"]{color:var(--ink)}
+.tab[aria-selected="true"] .ico-bg{fill:var(--hl)}
+
+/* ---------- study ---------- */
+.study{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px;padding:8px 16px 12px}
+.hdr{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;min-height:56px}
+.count{justify-self:start;font-family:var(--f-num);font-weight:600;font-size:14px;background:var(--card);border:1px solid var(--line);padding:5px 11px;border-radius:999px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.count small{color:var(--muted);font-weight:500}
+.acc{text-align:center;line-height:1.1}
+.acc .lab{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.04em}
+.acc .val{font-family:var(--f-num);font-size:24px;font-weight:600;font-variant-numeric:tabular-nums}
+.acc .sub{font-family:var(--f-num);font-size:11px;color:var(--muted)}
+.acc .tagnew{display:inline-block;margin-top:4px;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);border:1px dashed var(--line);border-radius:999px;padding:3px 10px}
+.hdr-right{justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.speak{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
+.speak svg{width:20px;height:20px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.badge.word{color:var(--word);background:var(--word-bg)}
+.badge.example{color:var(--ex);background:var(--ex-bg)}
+.badge.sec-LC{color:var(--word);background:var(--word-bg);font-size:13px;letter-spacing:.02em}
+.badge.sec-RC{color:var(--ex);background:var(--ex-bg);font-size:13px;letter-spacing:.02em}
+.seg.secseg{grid-template-columns:1fr 1fr;padding:4px;gap:4px;border-radius:14px}
+.seg.secseg button{height:auto;min-height:56px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;line-height:1.2;border-radius:11px;min-width:0}
+.seg.secseg button b{font-size:15px;white-space:nowrap}
+.seg.secseg button small{font-size:11.5px;font-weight:500;color:var(--muted);white-space:nowrap}
+.li .tag{font-size:11px;font-weight:700;margin-bottom:1px}
+.li .tag.sec-LC{color:var(--word)} .li .tag.sec-RC{color:var(--ex)}
+.claude-card .cc-head{display:flex;gap:12px;align-items:flex-start}
+.claude-card .cc-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--hl);color:#1A1606;flex:none}
+.claude-card .cc-ic svg{width:22px;height:22px}
+.btn span svg{width:18px;height:18px;display:block}
+.sigbox{display:block;max-width:100%;font-family:var(--f-num);font-size:12px;line-height:1.5;word-break:break-all;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;text-align:left;user-select:all;-webkit-user-select:all}
+.reapv{margin:0;padding:10px 12px;border-radius:10px;background:var(--ex-bg);color:var(--ex);font-size:13px;font-weight:600}
+.adm{background:var(--sunk);border-radius:12px;padding:10px 12px}
+.adm summary{font-size:13px;font-weight:700;color:var(--muted);cursor:pointer}
+.adm[open] summary{margin-bottom:8px}
+.auth{display:flex;flex-direction:column;gap:14px;padding-top:28px}
+.brand{text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:6px}
+.brand-word{font-family:var(--f-en);font-weight:600;font-size:52px;line-height:1.1}
+.brand-word .hl{background:linear-gradient(transparent 60%,var(--hl) 60%,var(--hl) 90%,transparent 90%)}
+.brand h1{margin:0;font-size:20px}
+.brand p{margin:0;color:var(--muted);font-size:13px;max-width:30ch}
+.aform{display:flex;flex-direction:column;gap:12px}
+.af{display:flex;flex-direction:column;gap:5px}
+.af span{font-size:12px;font-weight:700;color:var(--muted);margin-left:2px}
+.ai{height:48px;border:1px solid var(--line);border-radius:12px;background:var(--sunk);padding:0 14px;font-size:16px;width:100%}
+.ai:focus{outline:2px solid var(--word);outline-offset:0;background:var(--card)}
+.aerr{margin:0;color:var(--no);font-size:13.5px;font-weight:600}
+.alinks{display:flex;flex-direction:column;align-items:center;gap:10px}
+.alinks .btn{width:100%}
+.alink{color:var(--muted);font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px;padding:6px}
+.reqbox{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--sunk);border-radius:14px;padding:14px;text-align:center}
+.reqbox>span{font-size:12px;color:var(--muted);font-weight:600}
+.reqbox>b{font-family:var(--f-num);font-size:34px;letter-spacing:.14em;font-variant-numeric:tabular-nums}
+.reqbox .timer{font-size:13px;color:var(--ink)}
+.reqbox .timer b{font-family:var(--f-num);color:var(--no)}
+.reqbox.expired>b{opacity:.35;text-decoration:line-through}
+.phone{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px}
+.phone b{font-family:var(--f-num)}
+a.btn{text-decoration:none;color:var(--ink)}
+.h1 .who{font-size:14px;font-weight:600;color:var(--muted);margin-left:8px}
+.countcol{justify-self:start;display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
+button.count{display:inline-flex;align-items:center;gap:1px;cursor:pointer}
+button.count .caret{width:12px;height:12px;margin-left:4px;color:var(--muted);display:inline-flex}
+button.count .caret svg{width:12px;height:12px}
+button.count.scoped{background:var(--hl-soft);border-color:var(--hl)}
+.scopecap{font-size:11px;font-weight:600;color:var(--muted);max-width:42vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg.seg3{grid-template-columns:repeat(3,1fr)}
+.dlist{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;max-height:38vh;overflow-y:auto}
+.drow{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 14px;border-bottom:1px solid var(--line);text-align:left}
+.drow:last-child{border-bottom:0}
+.dchk{width:22px;height:22px;border-radius:6px;border:2px solid var(--line);display:grid;place-items:center}
+.dchk svg{width:14px;height:14px;opacity:0}
+.drow.on .dchk{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.drow.on .dchk svg{opacity:1}
+.dname{font-weight:600;font-size:14.5px}
+.dmeta{font-family:var(--f-num);font-size:13px;font-weight:600;text-align:right}
+.dmeta small{display:block;font-size:11px;color:var(--muted);font-weight:500}
+.scopefoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.scopefoot b{font-family:var(--f-num)}
+.searchrow{display:flex;gap:8px}
+.searchrow .search{flex:1;min-width:0}
+.datesel{flex:none;max-width:46%;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--card);padding:0 10px;font-size:14px;font-weight:600}
+.daypick{padding:14px}
+.daypick.need{box-shadow:0 0 0 3px var(--no),var(--shadow)}
+.dp-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.dp-head b{font-size:15px}
+.dp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.dp-grid button{height:40px;border-radius:11px;background:var(--sunk);font-family:var(--f-num);font-weight:600;font-size:15px;color:var(--ink)}
+.dp-grid button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}
+.unified{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;position:relative;cursor:pointer}
+.unified .cc-ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:var(--hl);color:#1A1606;flex:none}
+.unified .cc-ic svg{width:24px;height:24px}
+.unified .u-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.unified .u-text b{font-size:16px}
+.unified .u-text span{font-size:12.5px;color:var(--muted)}
+.unified input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.echips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.daychip{font-size:11.5px;font-weight:700;color:var(--muted);background:var(--sunk);border-radius:999px;padding:4px 9px}
+.daychip.none{color:var(--no)}
+.filters{display:flex;flex-direction:column;gap:8px}
+.frow{display:flex;gap:8px;align-items:center}
+.frow .datesel{flex:1;max-width:none;min-width:0}
+.frow .fseg{flex:1.4;min-width:0}
+.frow .fseg button{height:34px;font-size:13px}
+.frow .chip{flex:none;height:40px}
+.fchips{flex-wrap:wrap;overflow:visible;margin-top:0;gap:8px 14px}
+.fgroup{display:inline-flex;gap:6px}
+.fsep{width:1px;height:20px;background:var(--line);align-self:center}
+.fsum{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:600;color:var(--muted);padding:0 2px}
+.dgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.dcell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;height:48px;border-radius:11px;background:var(--card);border:1px solid var(--line)}
+.dcell b{font-size:13.5px}
+.dcell small{font-family:var(--f-num);font-size:11px;color:var(--muted)}
+.dcell.on{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.dcell.on small{color:var(--on-primary);opacity:.8}
+.dcell[disabled]{opacity:.35}
+.unified .cc-ic.plain{background:var(--primary);color:var(--on-primary)}
+button.unified{width:100%;text-align:left}
+.bulkbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;font-size:13px;font-weight:600;color:var(--muted)}
+.bulkbar .datesel{height:36px;font-size:13px}
+.li .tagdate{color:var(--muted);font-weight:500}
+.badge-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:-6px}
+.kindsw{display:inline-grid;grid-auto-flow:column;background:var(--sunk);border-radius:999px;padding:3px;gap:2px}
+.kindsw button{height:28px;padding:0 12px;border-radius:999px;font-size:12.5px;font-weight:700;color:var(--muted)}
+.kindsw button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+
+.qcard,.acard{flex:1 1 0;min-height:0;border-radius:var(--r);position:relative;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;overflow:hidden}
+.qcard{background:var(--card);box-shadow:var(--shadow);transition:box-shadow .2s, transform .25s}
+.qcard.flash-ok{box-shadow:0 0 0 3px var(--ok),var(--shadow)}
+.qcard.flash-no{box-shadow:0 0 0 3px var(--no),var(--shadow)}
+.qcard.enter{animation:enter .28s ease-out}
+@keyframes enter{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.term-word{font-family:var(--f-en);font-weight:600;font-size:clamp(34px,11vw,54px);line-height:1.1;overflow-wrap:anywhere}
+.term-ex{font-family:var(--f-en);font-weight:500;font-size:21px;line-height:1.45;text-wrap:pretty;overflow-wrap:anywhere}
+.term-ex.long{font-size:18px}
+.hl{background:linear-gradient(transparent 58%,var(--hl-soft) 58%,var(--hl-soft) 92%,transparent 92%);padding:0 .06em}
+.term-word .hl{background:linear-gradient(transparent 60%,var(--hl) 60%,var(--hl) 90%,transparent 90%)}
+.acard{background:var(--sunk);border:1.5px dashed var(--line);cursor:pointer;flex-direction:column;gap:10px;user-select:none;-webkit-user-select:none}
+.acard.open{background:var(--card);border-style:solid;border-color:var(--line)}
+.acard .hint{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-weight:600;font-size:14px}
+.acard .hint svg{width:30px;height:30px}
+.meaning{font-size:23px;font-weight:600;line-height:1.45;text-wrap:pretty;overflow-wrap:anywhere}
+.meaning.ex{font-size:17px;font-weight:500}
+.ref{font-size:12px;color:var(--muted)}
+.ref b{font-family:var(--f-en);font-size:15px;color:var(--ink);font-weight:600}
+.ox{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.oxb{height:64px;border-radius:16px;color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .12s}
+.oxb:active{transform:scale(.96)}
+.oxb .big{font-family:var(--f-num);font-size:28px;font-weight:600;line-height:1}
+.oxb .sm{font-size:13px;font-weight:600;opacity:.9}
+.oxb.o{background:var(--ok)} .oxb.x{background:var(--no)}
+:root[data-theme="dark"] .oxb,.oxb{color:#fff}
+
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:24px 16px}
+.empty h2{margin:0;font-size:20px;text-wrap:balance}
+.empty p{margin:0;color:var(--muted);max-width:30ch}
+.mock{width:100%;max-width:300px;background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:22px 16px;font-family:var(--f-en);font-size:32px;font-weight:600}
+
+/* ---------- common ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 20px;border-radius:14px;font-weight:700;font-size:15px}
+.btn.primary{background:var(--primary);color:var(--on-primary)}
+.btn.ghost{background:var(--card);border:1px solid var(--line)}
+.btn.danger{background:var(--no);color:#fff}
+.btn.sm{height:36px;padding:0 14px;font-size:13px;border-radius:11px}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.btn svg{width:20px;height:20px}
+.h1{font-size:28px;font-weight:700;margin:6px 0 12px;letter-spacing:-.01em}
+.section{margin-top:18px}
+.section>h3{font-size:13px;font-weight:700;color:var(--muted);margin:0 0 8px 4px;letter-spacing:.02em;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.panel{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
+.note{font-size:12.5px;color:var(--muted);margin:8px 4px 0}
+
+/* ---------- register ---------- */
+.sources{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.src{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:18px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;position:relative;cursor:pointer}
+.src .ic{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;background:var(--primary);color:var(--on-primary)}
+.src .ic svg{width:28px;height:28px}
+.src b{font-size:15px}
+.src span{font-size:12px;color:var(--muted);line-height:1.35;white-space:pre-line}
+.src .rec{position:absolute;top:10px;right:10px;font-size:10px;font-weight:700;background:var(--hl);color:#1A1606;border-radius:6px;padding:2px 6px}
+.src input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+details.tip{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:14px 16px}
+details.tip summary{font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:8px}
+details.tip summary::-webkit-details-marker{display:none}
+details.tip summary::after{content:"＋";color:var(--muted)}
+details.tip[open] summary::after{content:"－"}
+.steps{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.steps b{background:var(--hl-soft);padding:0 3px;border-radius:3px}
+
+.cropwrap{position:relative;margin:0 auto;touch-action:none;user-select:none;-webkit-user-select:none;overflow:hidden;border-radius:12px;background:#000}
+.cropwrap canvas{display:block;width:100%;height:auto}
+.cropbox{position:absolute;border:2px solid var(--hl);box-shadow:0 0 0 9999px rgba(0,0,0,.5)}
+.handle{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:var(--hl);border:3px solid #fff;touch-action:none}
+.croptools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.toggle{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin-left:auto}
+.switch{width:46px;height:28px;border-radius:999px;background:var(--line);position:relative;transition:background .2s;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.switch[aria-checked="true"]{background:var(--ok)}
+.switch[aria-checked="true"]::after{transform:translateX(18px)}
+
+.prog{height:8px;border-radius:999px;background:var(--sunk);overflow:hidden;margin-top:10px}
+.prog i{display:block;height:100%;background:var(--primary);width:0;transition:width .25s}
+.status{font-size:14px;font-weight:600;display:flex;gap:8px;align-items:center}
+.spin{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--line);border-top-color:var(--ink);animation:sp 0.8s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+textarea.raw{width:100%;min-height:150px;resize:vertical;border:1px solid var(--line);border-radius:12px;background:var(--sunk);padding:12px;font-size:14px;line-height:1.5}
+.row-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
+.entry{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);align-items:start}
+.entry:last-child{border-bottom:0}
+.entry.off{opacity:.5}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;margin-top:2px}
+.chk svg{width:16px;height:16px;opacity:0}
+.entry:not(.off) .chk{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.entry:not(.off) .chk svg{opacity:1}
+.entry .fields{display:flex;flex-direction:column;gap:6px;min-width:0}
+.fld{width:100%;border:0;border-bottom:1px dashed transparent;background:none;padding:2px 0;resize:none;overflow:hidden;line-height:1.4;display:block}
+.fld:focus{outline:none;border-bottom-color:var(--line)}
+.fld.term{font-family:var(--f-en);font-size:18px;font-weight:600}
+.fld.term.ex{font-size:15.5px;font-weight:500}
+.fld.mean{font-size:14px;color:var(--muted)}
+.fld.mean.missing::placeholder{color:var(--no)}
+.del{width:32px;height:32px;display:grid;place-items:center;color:var(--muted);border-radius:8px}
+.del svg{width:18px;height:18px}
+.savebar{padding:10px 16px;border-top:1px solid var(--line);background:var(--card)}
+.savebar .btn{width:100%}
+
+/* ---------- list ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:14px 4px}
+.stat{text-align:center;border-right:1px solid var(--line);padding:0 4px;min-width:0}
+.stat:last-child{border-right:0}
+.stat b{display:block;font-family:var(--f-num);font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat span{font-size:11px;color:var(--muted)}
+.search{width:100%;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--card);padding:0 14px;font-size:15px}
+.chips{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding-bottom:2px}
+.chip{flex:none;height:32px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:13px;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.list{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);margin-top:12px;overflow:hidden}
+.li{display:grid;grid-template-columns:4px minmax(0,1fr) auto;gap:12px;padding:12px 14px 12px 0;border-bottom:1px solid var(--line);width:100%;text-align:left;align-items:center}
+.li:last-child{border-bottom:0}
+.li .bar{align-self:stretch;border-radius:0 3px 3px 0}
+.li .bar.word{background:var(--word)} .li .bar.example{background:var(--ex)}
+.li .t{font-family:var(--f-en);font-weight:600;font-size:17px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.li .t.ex{font-size:14.5px;font-weight:500}
+.li .m{font-size:13px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.li .r{text-align:right;font-family:var(--f-num);font-size:13px;font-weight:600;white-space:nowrap}
+.li .r small{display:block;font-size:11px;color:var(--muted);font-weight:500}
+.more{display:block;width:100%;padding:14px;text-align:center;font-weight:600;color:var(--word)}
+.topbar{display:flex;justify-content:space-between;align-items:center}
+.iconbtn{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--card);border:1px solid var(--line)}
+.iconbtn svg{width:22px;height:22px}
+
+/* ---------- sheet & toast ---------- */
+.backdrop{position:fixed;inset:0;background:rgba(10,15,26,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{width:100%;max-width:560px;max-height:88%;overflow-y:auto;background:var(--paper);border-radius:22px 22px 0 0;padding:10px 16px calc(20px + env(safe-area-inset-bottom,0px));animation:up .25s ease-out}
+@keyframes up{from{transform:translateY(30px);opacity:.5}}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 10px}
+.sheet h2{font-size:18px;margin:4px 0 14px;display:flex;justify-content:space-between;align-items:center}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--sunk);border-radius:11px;padding:3px;gap:3px}
+.seg button{height:34px;border-radius:9px;font-weight:600;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.form-l{font-size:12px;font-weight:700;color:var(--muted);margin:14px 4px 6px}
+.input{width:100%;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:10px 12px;font-size:15px;resize:vertical}
+.input.en{font-family:var(--f-en);font-size:17px}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.kv div{background:var(--card);border-radius:12px;padding:10px;text-align:center;border:1px solid var(--line)}
+.kv b{display:block;font-family:var(--f-num);font-size:17px}
+.kv span{font-size:11px;color:var(--muted)}
+.menu{display:flex;flex-direction:column;background:var(--card);border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.menu button{display:flex;align-items:center;gap:12px;padding:15px 16px;border-bottom:1px solid var(--line);text-align:left;font-weight:600}
+.menu button:last-child{border-bottom:0}
+.menu button svg{width:20px;height:20px;color:var(--muted);flex:none}
+.menu button.warn{color:var(--no)} .menu button.warn svg{color:var(--no)}
+.menu button small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(150px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--ink);color:var(--paper);border-radius:14px;padding:10px 14px;font-size:14px;font-weight:600;display:flex;gap:14px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:calc(100% - 32px);animation:up .2s}
+.toast button{color:var(--hl);font-weight:700;white-space:nowrap;flex:none}
+.warnbar{margin:8px 16px 0;padding:8px 12px;border-radius:10px;background:var(--ex-bg);color:var(--ex);font-size:12.5px;font-weight:600}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+@media (max-height:640px){.term-word{font-size:34px}.meaning{font-size:19px}.oxb{height:54px}.hdr{min-height:48px}}
+</style>
+
+<div class="app" id="app">
+  <div id="warn" class="warnbar" hidden></div>
+  <main class="screen" id="screen"></main>
+  <nav class="tabs" role="tablist" aria-label="메뉴">
+    <button class="tab" role="tab" data-tab="study" aria-selected="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect class="ico-bg" x="4" y="5" width="16" height="14" rx="3" fill="none"/><path d="M4 12h16"/><path d="M9 8.5h6"/></svg>
+      암기</button>
+    <button class="tab" role="tab" data-tab="add" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path class="ico-bg" fill="none" d="M4 8.5a2 2 0 0 1 2-2h2l1.5-2h5l1.5 2h2a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>
+      등록</button>
+    <button class="tab" role="tab" data-tab="list" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path class="ico-bg" fill="none" d="M5 4.5h10a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h10"/><path d="M9 8h5"/></svg>
+      단어장</button>
+    <button class="tab" role="tab" data-tab="admin" aria-selected="false" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path class="ico-bg" fill="none" d="M12 3.5l7 2.8v5.2c0 4.3-2.9 7.7-7 9-4.1-1.3-7-4.7-7-9V6.3z"/><path d="M9 12l2 2 4-4"/></svg>
+      관리자</button>
+  </nav>
+</div>
+<div id="layer"></div>
+
+<script src="tesseract.min.js"></script>
+<script>
+// ===== 단어장 텍스트 파서 (OCR 결과 / 아이폰 텍스트 인식 붙여넣기 공용) =====
+const VocabParser = (() => {
+  const isHangul = (c) => {
+    const n = c.codePointAt(0);
+    return (n >= 0xac00 && n <= 0xd7a3) || (n >= 0x3131 && n <= 0x318e);
+  };
+  const hangulCount = (s) => { let k = 0; for (const c of s) if (isHangul(c)) k++; return k; };
+  const latinCount = (s) => (s.match(/[A-Za-z]/g) || []).length;
+  const hasHangul = (s) => hangulCount(s) > 0;
+  const hasLatin = (s) => /[A-Za-z]/.test(s);
+  const tidy = (s) => s.replace(/\s+/g, ' ').trim();
+
+  // 번호: "11." "11," "11 ." "(11)" "11)" — OCR 오인식 "I1." "l1." 도 허용
+  const ENTRY_RE = /^[\(\[]?\s*[Il|]?(\d{1,4})\s*[.,)\]]\s*(?=[A-Za-z~(\[])/;
+  const POS_RE = /\b(n|v|vt|vi|adj|adv|a|ad|prep|conj|pron|phr|int)\.(?=\s|$)/gi;
+
+  // OCR 자잘한 오류 정리
+  function normalize(raw) {
+    let s = String(raw || '')
+      .replace(/[  -​　]/g, ' ')
+      .replace(/[‘’`´]/g, "'").replace(/[“”]/g, '"')
+      .replace(/ﬁ/g, 'fi').replace(/ﬂ/g, 'fl')
+      .replace(/[—–]/g, '-');
+    s = s.trim();
+    // 점선 테두리가 글자로 읽힌 것 (줄 앞/뒤의 | ¦ ! : 등)
+    s = s.replace(/^[|¦!:;_\-]+\s*/, '').replace(/^=+(?!\s*[A-Za-z])\s*/, '').replace(/\s*[|¦!_=]+$/, '');  // "= PR" 동의어 표기는 유지
+    // 숙어 표시 ">" 의 다양한 오인식 통일
+    s = s.replace(/^[›»＞→▶▸]\s*/, '> ');
+    // "| 11." 처럼 테두리 뒤 번호 / 테두리가 l, I 로 읽힌 경우
+    s = s.replace(/^[lI1|]\s+(?=\d{1,4}\s*[.,)])/, '');
+    // 손글씨 표시 등으로 번호 앞에 붙은 기호 "/17." "^17."
+    s = s.replace(/^[^\w가-힣(\[~"']+(?=\d{1,4}\s*[.,)])/, '');
+    // 홀로 떨어진 자모·가운뎃점 (테두리/얼룩 오인식)
+    s = s.replace(/(^|\s)[\u3131-\u318e·ㆍ]+(?=\s|$)/g, '$1').trim();
+    // 테두리가 i, l 로 읽혀 한글 앞에 붙은 경우
+    s = s.replace(/^[Il|]['`]\s+/, '');
+    s = s.replace(/^[iIl|]\s+(?=[가-힣])/, '').replace(/\s+[iIl|]$/, '');
+    // 영어 문장 끝 뒤에 붙은 짧은 잡음 "authority.:" "skill. )" "form. 나 5"
+    if (latinCount(s) > hangulCount(s)) s = s.replace(/([.?!])(?:\s*[^\sA-Za-z0-9]{1,3}|\s+\S{1,2}){1,3}$/, '$1');
+    // 글머리 기호
+    s = s.replace(/^[□☐☑■●○◦•▪▫◇◆☆★✓✔*·]+\s*/, '');
+    // 문장부호 앞 공백 정리
+    s = s.replace(/\s+([,.;:?!)])/g, '$1').replace(/\(\s+/g, '(');
+    // 한글이 한 글자씩 띄어져 인식된 경우 붙이기 (예: "전 자 장 비 의")
+    s = s.replace(/(?:[가-힣] ){3,}[가-힣](?![가-힣])/g, (m) => m.replace(/ /g, ''));
+    return tidy(s);
+  }
+
+  function isNoise(s) {
+    if (s.length < 2) return true;
+    if (!hasLatin(s) && !hasHangul(s)) return true;               // "-44-" 같은 쪽 번호
+    if (/^(day|unit|chapter|lesson|part|week|test|review)\s*\d+$/i.test(s)) return true;
+    if (/vocab/i.test(s) && s.length < 40 && hangulCount(s) <= 6 && !ENTRY_RE.test(s)) return true; // 머리글
+    return false;
+  }
+
+  const endsSentence = (s) => /[.?!"']$/.test(s.trim());
+  function isSentence(s) {
+    const words = s.split(' ').filter((w) => /[A-Za-z]/.test(w));
+    return words.length >= 4 || (words.length >= 3 && endsSentence(s));
+  }
+
+  // 한국어 줄인가? (영어 고유명사가 섞여 있어도 한글이 주도하면 한국어)
+  function isKoreanLine(s) {
+    const h = hangulCount(s), l = latinCount(s);
+    if (h === 0) return false;
+    if (h >= 2) return h >= l * 0.3;   // "Star Airways사는 …" 은 한국어, "수르 fastest way …" 는 영어
+    return l < 3;
+  }
+
+  function stripForProbe(s) {
+    return tidy(s.replace(/\[[^\]]*\]/g, ' ').replace(/\/[^/]{1,40}\//g, ' ').replace(POS_RE, ' '));
+  }
+
+  // "abandon [əbǽndən] v." → { term: "abandon", pos: "v." }
+  function cleanWord(s) {
+    let t = s.replace(/\[[^\]]*\]/g, ' ').replace(/\/[^/]{1,40}\//g, ' ');
+    let pos = null;
+    const m = t.match(/\b(n|v|vt|vi|adj|adv|a|ad|prep|conj|pron|phr|int)\.(?=\s|$)/i);
+    if (m) { pos = m[0].toLowerCase(); t = t.replace(m[0], ' '); }
+    // 표제어 뒤 잡음: "exempt 8)" (형)의 오인식) 같은 숫자/짧은 괄호 조각
+    let lost = null;
+    t = t.replace(/\s+(\S{1,2}\))\s*$/, (m, g) => { lost = g; return ''; });
+    if (lost && /^[8B]\)$/.test(lost)) pos = pos || '형)';
+    t = t.replace(/^[^A-Za-z~]+/, '').replace(/[^A-Za-z~)]+$/, '');
+    return { term: tidy(t), pos };
+  }
+
+  // 첫 한글 위치에서 영어/한국어 분리. "(~에)" 같은 앞쪽 괄호는 뜻 쪽으로
+  function splitEnKo(line) {
+    const chars = [...line];
+    let cut = chars.findIndex(isHangul);
+    if (cut < 0) return null;
+    const carry = new Set(['(', '[', '{', '~', '<', '（', '【', '「']);
+    while (cut > 0 && (carry.has(chars[cut - 1]) || (chars[cut - 1] === ' ' && cut > 1 && carry.has(chars[cut - 2])))) cut--;
+    // 품사 약어 "형)" "명)" "동)" 는 이미 한글이므로 그대로 뜻에 포함됨
+    const en = chars.slice(0, cut).join('').trim();
+    const ko = chars.slice(cut).join('').trim();
+    if (!hasLatin(en)) return null;
+    return { en, ko };
+  }
+
+  function joinEnglish(a, b) {
+    if (!a) return b;
+    if (/[A-Za-z]-$/.test(a) && /^[a-z]/.test(b)) return a.slice(0, -1) + b; // 줄 끝 하이픈
+    return a + ' ' + b;
+  }
+
+  function makeWord(en, ko) {
+    const { term, pos } = cleanWord(en);
+    let meaning = tidy(ko || '');
+    if (pos && meaning) meaning = pos + ' ' + meaning;
+    return { term, meaning, kind: 'word', include: !!(term && meaning) };
+  }
+  function makeExample(en, ko, ref) {
+    // 문장 끝 뒤에 붙은 짧은 잡음 제거 ("downtown. TE")
+    const term = tidy(en).replace(/([.?!])(?:\s*[^\sA-Za-z0-9]{1,3}|\s+\S{1,2}){1,3}$/, '$1');
+    const meaning = tidy(ko || '');
+    return { term, meaning, kind: 'example', ref: ref || '', include: !!(term && meaning) };
+  }
+
+  // ---------- 번호가 매겨진 단어장 (R/C: "11. steadily 꾸준히", L/C 표: "1 merchandise (명) 상품") ----------
+  const ENTRY_RE2 = /^[\(\[]?\s*[Il|]?(\d{1,3})\s+(?=[A-Za-z~])/;       // 번호 뒤 점 없는 형식
+  const PHRASE_MARK = /^>\s*/;                                            // "> promotional merchandise"
+  const POS_KO = /^[\(\[]?\s*(명|동|형|부|전|접|대|감)\s*[\)\]]/;           // "(명) 상품" 품사 표시
+  const SYN_RE = /^[=≒≈]\s*[A-Za-z]/;                                     // "= PR"
+  const koreanLed = (l) => /^[(\[]?\s*[가-힣]/.test(l) || /[A-Za-z]{2,}[가-힣]/.test(l);
+  function stripHead(l) { return ENTRY_RE.test(l) ? l.replace(ENTRY_RE, '') : l.replace(ENTRY_RE2, ''); }
+  function hasNumber(l) { return ENTRY_RE.test(l) || ENTRY_RE2.test(l); }
+  function isHeadLine(l) {
+    if (PHRASE_MARK.test(l)) return false;
+    if (ENTRY_RE.test(l)) return true;
+    const m = l.match(ENTRY_RE2);
+    const body = m ? l.slice(m[0].length) : l;
+    const sp = hasHangul(body) ? splitEnKo(body) : null;
+    const en = sp ? sp.en : body;
+    if (!hasLatin(en) || isSentence(stripForProbe(en))) return false;
+    if (m) return true;
+    // OCR이 번호를 놓쳐도 "(명)" 같은 품사로 시작하는 뜻이 붙어 있으면 표제어로 봄
+    return !!(sp && POS_KO.test(sp.ko) && latinCount(en) >= 2 && !koreanLed(body));
+  }
+
+  function parseNumbered(lines) {
+    const out = [];
+    const blocks = [];
+    let block = null;
+    for (const l of lines) {
+      if (isHeadLine(l)) { block = { head: stripHead(l), rest: [] }; blocks.push(block); }
+      else if (block) block.rest.push(l);
+    }
+    for (const b of blocks) {
+      const sp = hasHangul(b.head) ? splitEnKo(b.head) : null;
+      const head = makeWord(sp ? sp.en : b.head, sp ? sp.ko : '');
+      if (!head.term) continue;
+      out.push(head);
+      let pend = null;      // 뜻을 기다리는 영어 { en, phrase }
+      let last = head;      // 줄바꿈된 뜻/해석을 이어붙일 대상
+      let orphan = null;    // 표에서 예문보다 위에 걸쳐 있는 해석 첫 줄
+      const finish = (ko) => {
+        if (!pend) return;
+        if (!pend.phrase && orphan) { ko = tidy(orphan + ' ' + ko); orphan = null; }
+        const it = pend.phrase ? makeWord(pend.en, ko) : makeExample(pend.en, ko, head.term);
+        if (it.term) { out.push(it); last = it; }
+        pend = null;
+      };
+      const addKo = (l) => {
+        if (pend) return finish(l);
+        // 짧은 뜻(단어·숙어) 뒤에 오는 긴 한국어 줄 = 다음 예문 해석의 첫 줄
+        if (last.kind === 'word' && last.meaning && hangulCount(l) >= 10 && !/[.!?]$/.test(l)) { orphan = orphan ? orphan + ' ' + l : l; return; }
+        if (!last.meaning) last.meaning = tidy(l);
+        else if (!/[.!?]$/.test(last.meaning)) last.meaning = tidy(last.meaning + ' ' + l);  // 끝나지 않은 뜻만 이어붙임 (분류 제목 등은 무시)
+        last.include = !!(last.term && last.meaning);
+      };
+      for (const raw of b.rest) {
+        let l = raw, mark = false;
+        if (PHRASE_MARK.test(l)) { l = l.replace(PHRASE_MARK, ''); mark = true; }
+        if (!l) continue;
+        if (SYN_RE.test(l)) {
+          const syn = l.replace(/[가-힣(].*$/, '').trim();
+          head.meaning = tidy(head.meaning + ' (' + syn + ')');
+          head.include = !!(head.term && head.meaning);
+          continue;
+        }
+        const K = hasHangul(l), E = hasLatin(l);
+        const pendSent = !!pend && !pend.phrase;
+        // 표에서 한 줄로 합쳐진 "…문장 끝부분. 해석" (앞 줄 예문의 이어짐 + 해석)
+        if (K && E && pendSent && !mark && !endsSentence(pend.en) && !koreanLed(l)) {
+          const s2 = splitEnKo(l);
+          if (s2 && /[.?!]["']?$/.test(s2.en)) { pend.en = joinEnglish(pend.en, s2.en); finish(s2.ko); continue; }
+        }
+        if (K && (!E || (pendSent && !mark) || koreanLed(l))) { addKo(l); continue; }
+        if (K && E) {
+          const s2 = splitEnKo(l);
+          if (s2) {
+            if (pend) finish('');
+            pend = { en: s2.en, phrase: mark || !isSentence(stripForProbe(s2.en)) };
+            finish(s2.ko);
+          } else addKo(l);
+          continue;
+        }
+        // 영어만 있는 줄
+        if (pend && !pend.phrase && !mark && !endsSentence(pend.en)) { pend.en = joinEnglish(pend.en, l); continue; }
+        if (pend) finish('');
+        pend = { en: l, phrase: mark || !isSentence(stripForProbe(l)) };
+      }
+      finish('');
+      if (orphan) { last.meaning = tidy(last.meaning + ' ' + orphan); last.include = !!(last.term && last.meaning); }
+    }
+    return out;
+  }
+
+  // ---------- 영어 칸 / 한국어 칸이 따로 읽힌 표 (아이폰 텍스트 인식 등) ----------
+  // 영어 줄들과 한국어 줄들을 각각 순서대로 모은 뒤 하나씩 짝지음
+  function parseSeparated(enLines, koLines) {
+    const items = [];
+    for (const raw of enLines) {
+      let l = raw, mark = false;
+      if (PHRASE_MARK.test(l)) { l = l.replace(PHRASE_MARK, ''); mark = true; }
+      if (!l || !hasLatin(l)) continue;
+      const prev = items[items.length - 1];
+      if (SYN_RE.test(l)) { items.push({ type: 'syn', en: l }); continue; }
+      if (!mark && hasNumber(l) && !isSentence(stripForProbe(stripHead(l)))) { items.push({ type: 'head', en: stripHead(l) }); continue; }
+      if (prev && prev.type === 'sentence' && !mark && !endsSentence(prev.en)) { prev.en = joinEnglish(prev.en, l); continue; }
+      items.push({ type: mark || !isSentence(stripForProbe(l)) ? 'phrase' : 'sentence', en: l });
+    }
+    const ko = koLines.filter((l) => hasHangul(l));
+    let k = 0;
+    for (let i = 0; i < items.length; i++) {
+      const it = items[i];
+      if (it.type === 'syn') continue;
+      if (k >= ko.length) { it.ko = ''; continue; }
+      if (it.type === 'sentence') {
+        let s = ko[k++];
+        while (k < ko.length && !/[.!?]$/.test(s) && !POS_KO.test(ko[k])) s += ' ' + ko[k++];
+        it.ko = s;
+      } else if (it.type === 'head' && !POS_KO.test(ko[k]) && k + 1 < ko.length && POS_KO.test(ko[k + 1])) {
+        k++; it.ko = ko[k++];               // 품사 표시로 다시 맞추기 (한 줄 밀린 경우)
+      } else it.ko = ko[k++];
+    }
+    const out = [];
+    let head = null;
+    for (const it of items) {
+      if (it.type === 'syn') { if (head) { head.meaning = tidy(head.meaning + ' (' + it.en.replace(/[가-힣(].*$/, '').trim() + ')'); head.include = !!(head.term && head.meaning); } continue; }
+      if (it.type === 'sentence') out.push(makeExample(it.en, it.ko, head ? head.term : ''));
+      else { const w = makeWord(it.en, it.ko); if (it.type === 'head') head = w; if (w.term) out.push(w); }
+    }
+    return out;
+  }
+
+  // 페이지 머리글로 L/C·R/C 판별
+  function detectSection(text) {
+    const t = String(text || '');
+    if (/R\s*[\/|]?\s*C\s*Vocab/i.test(t)) return 'RC';
+    if (/L\s*[\/|]?\s*C\s*\d{1,2}\s*일\s*차/i.test(t) || /L\s*[\/|]?\s*C\s*Vocab/i.test(t)) return 'LC';
+    if (/R\s*[\/|]?\s*C\s*\d{1,2}\s*일\s*차/i.test(t)) return 'RC';
+    // 머리글이 안 읽힌 경우 구조로 판단: "> 숙어"·"(명)" 표시가 여러 번 → L/C 표, "11. word" 번호 형식 → R/C
+    const lines = t.split(/\r?\n/).map((x) => x.trim());
+    const lcMarks = lines.filter((x) => /^[>›»]\s*[A-Za-z]/.test(x) || /\((명|동|형|부)\)/.test(x)).length;
+    const rcMarks = lines.filter((x) => /^\d{1,3}\.\s*[A-Za-z]/.test(x)).length;
+    if (lcMarks >= 3 && lcMarks > rcMarks) return 'LC';
+    if (rcMarks >= 3 && lcMarks === 0) return 'RC';
+    return null;
+  }
+
+  // ---------- 번호 없는 일반 단어장 ----------
+  function parseGeneric(lines) {
+    const out = [];
+    let pending = null;     // 뜻을 기다리는 영어
+    let lastIdx = -1;
+    let lastWord = '';
+    const pushEn = (en, ko) => {
+      const probe = stripForProbe(en);
+      if (isSentence(probe)) out.push(makeExample(en, ko, lastWord));
+      else { const w = makeWord(en, ko); out.push(w); lastWord = w.term; }
+      lastIdx = out.length - 1;
+    };
+    const flushPending = () => { if (pending) pushEn(pending, ''); pending = null; };
+
+    for (const l of lines) {
+      const K = hasHangul(l);
+      let E = hasLatin(l);
+      if (E && K) {
+        const pendingIsSentence = pending && isSentence(pending);
+        if (pendingIsSentence || /[A-Za-z0-9&]+[가-힣]/.test(l) || (hangulCount(l) >= 12 && hangulCount(l) > latinCount(l) * 2)) E = false;
+      }
+      const sp = E && K ? splitEnKo(l) : null;
+      if (sp) {
+        flushPending();
+        pushEn(sp.en, sp.ko);
+      } else if (E && !K) {
+        if (pending && isSentence(pending) && !endsSentence(pending)) pending = joinEnglish(pending, l);
+        else { flushPending(); pending = l; }
+        lastIdx = -1;
+      } else if (K) {
+        if (pending) { pushEn(pending, l); pending = null; }
+        else if (lastIdx >= 0) {
+          const e = out[lastIdx];
+          e.meaning = tidy(e.meaning + ' ' + l);
+          e.include = !!(e.term && e.meaning);
+        }
+      }
+    }
+    flushPending();
+    return out.filter((e) => e.term);
+  }
+
+  const toLines = (text) => (Array.isArray(text) ? text : String(text).split(/\r?\n/))
+    .map(normalize).filter((l) => l && !isNoise(l));
+
+  // opts.section: 'LC' 이면 영어/한국어 칸이 따로 읽힌 표도 자동으로 짝지음
+  function parse(text, opts) {
+    const lines = toLines(text);
+    const section = opts && opts.section;
+    if (section === 'LC' && !(opts && opts.fromOCR)) {
+      const enOnly = lines.filter((l) => hasLatin(l) && !hasHangul(l)).length;
+      const koOnly = lines.filter((l) => hasHangul(l) && (!hasLatin(l) || koreanLed(l))).length;
+      const mixed = lines.filter((l) => hasHangul(l) && hasLatin(l) && !koreanLed(l)).length;
+      if (enOnly >= 3 && koOnly >= 3 && mixed <= Math.max(1, (enOnly + mixed) * 0.2)) {
+        const first = lines.findIndex((l) => hasNumber(l) && isHeadLine(l));
+        const body = first >= 0 ? lines.slice(first) : lines;
+        return parseSeparated(body.filter((l) => hasLatin(l) && !(hasHangul(l) && koreanLed(l))), body.filter((l) => hasHangul(l) && (!hasLatin(l) || koreanLed(l))));
+      }
+    }
+    const numbered = lines.filter((l) => hasNumber(l) && isHeadLine(l)).length;
+    return numbered >= 2 ? parseNumbered(lines) : parseGeneric(lines);
+  }
+  // ---------- Claude가 사진을 읽고 돌려준 JSON ----------
+  // [{"sec":"LC|RC","type":"word|phrase|example","en":"...","ko":"...","head":"..."}]
+  function looksLikeJSON(text) { return /\[\s*\{[\s\S]*"(en|ko|type)"\s*:/.test(String(text || '')); }
+  function parseJSON(text) {
+    const t = String(text || '');
+    let data = null;
+    const tryParse = (s) => { try { return JSON.parse(s); } catch (e) { return null; } };
+    data = tryParse(t.trim());
+    if (!data) { const m = t.match(/```(?:json)?\s*([\s\S]*?)```/); if (m) data = tryParse(m[1]); }
+    if (!data) { const a = t.indexOf('['), b = t.lastIndexOf(']'); if (a >= 0 && b > a) data = tryParse(t.slice(a, b + 1)); }
+    if (data && !Array.isArray(data)) data = data.items || data.entries || null;
+    if (!Array.isArray(data)) return null;
+    const out = [];
+    for (const r of data) {
+      if (!r || typeof r !== 'object') continue;
+      const en = tidy(String(r.en || r.term || '')).replace(/^[>›»]\s*/, '').replace(/^\(?\d{1,3}\s*[.)]?\s+(?=[A-Za-z~])/, '');
+      const ko = tidy(String(r.ko || r.meaning || ''));
+      if (!en) continue;
+      const kind = /ex/i.test(String(r.type || '')) ? 'example' : 'word';
+      const sec = /^l/i.test(String(r.sec || r.section || '')) ? 'LC' : /^r/i.test(String(r.sec || r.section || '')) ? 'RC' : '';
+      const dn = parseInt(r.day, 10);
+      out.push({ term: en, meaning: ko, kind, ref: kind === 'example' ? tidy(String(r.head || r.ref || '')) : '', section: sec, day: dn >= 1 && dn <= 11 ? dn : null, include: !!ko });
+    }
+    return out;
+  }
+
+  // 영어 칸 / 한국어 칸을 따로 붙여넣은 경우
+  function parseColumns(enText, koText) { return parseSeparated(toLines(enText), toLines(koText)); }
+
+  return { parse, parseColumns, parseJSON, looksLikeJSON, detectSection, normalize, isKoreanLine, hangulCount, latinCount, hasHangul };
+})();
+
+
+</script>
+<script>
+"use strict";
+/* ================= 아이콘 ================= */
+const I = {
+  speak:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>',
+  tap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M12 10.5V9a1.5 1.5 0 0 1 3 0v2"/><path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-.5a6 6 0 0 1-4.6-2.2L4.5 16a1.5 1.5 0 0 1 2.3-1.9L9 16"/></svg>',
+  camera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 8.5a2 2 0 0 1 2-2h2l1.5-2h5l1.5 2h2a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+  text:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5h16v2"/><path d="M12 5v14"/><path d="M9 19h6"/><path d="M3 12h2M19 12h2"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  rotate:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>',
+  more:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18" cy="12" r="1.8"/></svg>',
+  down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/></svg>',
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="M7.5 8.5L12 4l4.5 4.5"/><path d="M5 19h14"/></svg>',
+  reset:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v5h5"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15"/><path d="M9 7V4.5h6V7"/><path d="M6.5 7l1 13h9l1-13"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+};
+
+/* ================= 저장소 (기기 안 IndexedDB) ================= */
+const Store = {
+  mode: 'memory', db: null,
+  async init() {
+    const open = (ms) => new Promise((res, rej) => {
+      const r = indexedDB.open('toeic-voca', 2);
+      r.onupgradeneeded = () => {
+        const db = r.result;
+        if (!db.objectStoreNames.contains('items')) db.createObjectStore('items', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('users')) db.createObjectStore('users', { keyPath: 'id' });   // 계정 (이 기기 안에만 저장)
+        if (!db.objectStoreNames.contains('meta')) db.createObjectStore('meta');                         // 자동 로그인 정보 등
+      };
+      r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+      r.onblocked = () => {};   // 예전 화면이 열려 있으면 닫힐 때까지 기다림
+      setTimeout(() => rej(new Error('timeout')), ms);
+    });
+    // 업데이트 직후엔 저장소 열기가 늦을 수 있어서, 넉넉히 기다리고 다시 시도 (예전엔 4초 만에 포기하고 빈 저장소를 썼음)
+    if (window.indexedDB) {
+      for (const ms of [10000, 10000, 15000]) {
+        try { this.db = await open(ms); this.mode = 'idb'; break; } catch (e) { await new Promise((r) => setTimeout(r, 400)); }
+      }
+    }
+    if (this.db) this.db.onversionchange = () => { try { this.db.close(); } catch (e) {} location.reload(); };
+    if (this.mode !== 'idb') {
+      try { localStorage.setItem('__t', '1'); localStorage.removeItem('__t'); this.mode = 'local'; }
+      catch (e2) { this.mode = 'memory'; }
+    }
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+  },
+  tx(mode) { return this.db.transaction('items', mode).objectStore('items'); },
+  async all() {
+    if (this.mode === 'idb') return new Promise((res, rej) => { const r = this.tx('readonly').getAll(); r.onsuccess = () => res(r.result || []); r.onerror = () => rej(r.error); });
+    if (this.mode === 'local') { try { return JSON.parse(localStorage.getItem('toeic-voca-items') || '[]'); } catch (e) { return []; } }
+    return [];
+  },
+  async putMany(items) {
+    this.mirrorItems();
+    if (this.mode === 'idb') return new Promise((res, rej) => {
+      const t = this.db.transaction('items', 'readwrite'); const s = t.objectStore('items');
+      items.forEach((it) => s.put(it)); t.oncomplete = () => res(); t.onerror = () => rej(t.error);
+    });
+    if (this.mode === 'local') this.saveLocal();
+  },
+  async put(item) { return this.putMany([item]); },
+  async del(ids) {
+    this.mirrorItems();
+    if (this.mode === 'idb') return new Promise((res, rej) => {
+      const t = this.db.transaction('items', 'readwrite'); const s = t.objectStore('items');
+      ids.forEach((id) => s.delete(id)); t.oncomplete = () => res(); t.onerror = () => rej(t.error);
+    });
+    if (this.mode === 'local') this.saveLocal();
+  },
+  saveLocal() {
+    try {
+      const others = JSON.parse(localStorage.getItem('toeic-voca-items') || '[]').filter((i) => !S.user || i.uid !== S.user.id);
+      localStorage.setItem('toeic-voca-items', JSON.stringify(others.concat(S.items)));
+    } catch (e) { showWarn('저장 공간이 부족해요. 백업을 내보내 두세요.'); }
+  },
+  mem: { users: [], meta: {} },
+  // 예비 사본: 계정·단어를 localStorage에도 복사 (기본 저장소가 비면 여기서 되살림)
+  mirrorUsers(list) { try { localStorage.setItem('toeic-voca-m-users', JSON.stringify(list)); } catch (e) {} },
+  _mt: null,
+  mirrorItems() {
+    clearTimeout(this._mt);
+    this._mt = setTimeout(() => { try { if (S.user) localStorage.setItem('toeic-voca-m-items:' + S.user.id, JSON.stringify(S.items)); } catch (e) {} }, 600);
+  },
+  readMirror(key) { try { const v = JSON.parse(localStorage.getItem(key) || 'null'); return Array.isArray(v) ? v : []; } catch (e) { return []; } },
+  async users() {
+    if (this.mode === 'idb') return new Promise((res, rej) => { const r = this.db.transaction('users', 'readonly').objectStore('users').getAll(); r.onsuccess = () => res(r.result || []); r.onerror = () => rej(r.error); });
+    if (this.mode === 'local') { try { return JSON.parse(localStorage.getItem('toeic-voca-users') || '[]'); } catch (e) { return []; } }
+    return this.mem.users.slice();
+  },
+  async putUser(u) {
+    this.mirrorUsers((this._users || []).filter((x) => x.id !== u.id).concat(u));
+    if (this.mode === 'idb') return new Promise((res, rej) => { const t = this.db.transaction('users', 'readwrite'); t.objectStore('users').put(u); t.oncomplete = () => { this.users().then((l) => { this._users = l; this.mirrorUsers(l); }); res(); }; t.onerror = () => rej(t.error); });
+    const list = (await this.users()).filter((x) => x.id !== u.id).concat(u);
+    if (this.mode === 'local') localStorage.setItem('toeic-voca-users', JSON.stringify(list)); else this.mem.users = list;
+  },
+  async getMeta(k) {
+    if (this.mode === 'idb') return new Promise((res) => { const r = this.db.transaction('meta', 'readonly').objectStore('meta').get(k); r.onsuccess = () => res(r.result); r.onerror = () => res(undefined); });
+    if (this.mode === 'local') { try { return JSON.parse(localStorage.getItem('toeic-voca-meta-' + k)); } catch (e) { return undefined; } }
+    return this.mem.meta[k];
+  },
+  async setMeta(k, v) {
+    if (this.mode === 'idb') return new Promise((res) => { const t = this.db.transaction('meta', 'readwrite'); t.objectStore('meta').put(v, k); t.oncomplete = () => res(); t.onerror = () => res(); });
+    if (this.mode === 'local') { try { localStorage.setItem('toeic-voca-meta-' + k, JSON.stringify(v)); } catch (e) {} return; }
+    this.mem.meta[k] = v;
+  },
+};
+
+/* ================= 상태 ================= */
+function loadSection() { try { return localStorage.getItem('toeic-voca-section') === 'LC' ? 'LC' : 'RC'; } catch (e) { return 'RC'; } }
+const SEC = { LC: 'L/C', RC: 'R/C' };
+const secOf = (it) => (it.section === 'LC' ? 'LC' : 'RC');
+const kindLabel = (it) => `${SEC[secOf(it)]} ${it.kind === 'word' ? '단어' : '예문'}`;
+const S = {
+  scope: { sec: 'all', kind: 'all', weak: false, days: [] },
+  user: null, users: [], auth: { mode: 'login', err: '', req: null, admin: { unlocked: false, code: '', result: '' } },
+  tab: 'study', items: [], current: null, revealed: false, last: null,
+  reg: { day: null, mode: 'device', queue: [], cur: null, entries: [], busy: false, status: '', progress: 0, raw: '', showText: false, twoCol: false, section: loadSection(), split: false, enText: '', koText: '' },
+  list: { q: '', limit: 80, days: [], secs: [], kinds: [], weak: false },
+};
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+const keyOf = (term, kind, section) => (section === 'LC' ? 'LC' : 'RC') + '|' + kind + '|' + term.toLowerCase().replace(/\s+/g, ' ').trim();
+const accOf = (it) => (it.attempts >= 2 ? it.correct / it.attempts : null);
+const pct = (v) => Math.round(v * 100) + '%';
+function newItem(e) {
+  return { id: uid(), uid: S.user ? S.user.id : '', term: e.term.trim(), meaning: e.meaning.trim(), kind: e.kind, section: e.section === 'LC' ? 'LC' : 'RC', day: dayOf(e) || null, ref: e.ref || '', weight: 1, attempts: 0, correct: 0, createdAt: Date.now(), lastSeen: 0 };
+}
+
+/* ================= DOM 도우미 ================= */
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k === 'html') el.innerHTML = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) if (c != null && c !== false) el.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  return el;
+}
+const $screen = document.getElementById('screen');
+const $layer = document.getElementById('layer');
+function showWarn(msg) { const w = document.getElementById('warn'); w.textContent = msg; w.hidden = !msg; }
+let toastTimer;
+function toast(msg, action) {
+  clearTimeout(toastTimer);
+  document.querySelectorAll('.toast').forEach((t) => t.remove());
+  const t = h('div', { class: 'toast', role: 'status' }, msg, action ? h('button', { onclick: () => { t.remove(); action.fn(); } }, action.label) : null);
+  document.body.append(t);
+  toastTimer = setTimeout(() => t.remove(), action ? 3500 : 2200);
+}
+function autosize(ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+
+/* ================= 계정 (로그인 · 가입 · 관리자 승인) ================= */
+// 계정은 각자의 기기 안에만 저장돼요 (서버 없음). 비밀번호는 PBKDF2로 암호화해서 보관.
+const ADMIN_PHONE = [43, 56, 50, 49, 48, 51, 57, 48, 50, 51, 57, 48, 51].map((c) => String.fromCharCode(c)).join('');
+const ADMIN_PHONE_VIEW = '010-' + ADMIN_PHONE.slice(5, 9) + '-' + ADMIN_PHONE.slice(9);
+// 승인 코드 = 관리자 폰에서 만든 전자서명 (ECDSA P-256). 앱에는 '확인용 공개 키'만 들어 있어서 코드를 읽어도 승인 코드를 만들 수 없음.
+// 서명용 비밀 키는 관리자 키로 암호화된 상태로만 들어 있음 (관리자 키 없이는 풀 수 없음).
+const SIGN_PUB = { kty: 'EC', crv: 'P-256', x: 'IXIuXHnx_7619HvLpSfWc6iOO3FYK-I7LhzalrfOgeg', y: 'uQ_TSMCOFCkJx8SYDtPAlofUphZEG4y78s4izT_JYHE' };
+const SIGN_LOCK = { salt: 'qObao4dDg-8DtLlzowTf9A', iv: 'dJ9bgMqpJEGAsrB9', ct: 'MG68jrDRlzfgfkW9gj6JrugZrBECDVasOAwsAexlGnEoH7RO_20WQYMpxaE5E64A89Xq0rX3IYV105Y', it: 310000 };
+const REQ_MINUTES = 5;
+const enc = new TextEncoder();
+const toB64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const fromB64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+async function hashPw(pw, salt) {
+  const k = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveBits']);
+  return toB64(await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: fromB64(salt), iterations: 150000, hash: 'SHA-256' }, k, 256));
+}
+async function sha256hex(t) { return [...new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode(t)))].map((b) => b.toString(16).padStart(2, '0')).join(''); }
+const b64u = (buf) => toB64(buf).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const fromB64u = (t) => { const x = t.replace(/-/g, '+').replace(/_/g, '/'); return fromB64(x + '='.repeat((4 - (x.length % 4)) % 4)); };
+// 서명 내용에 아이디도 넣음 (v3): 다른 사람의 승인 코드를 가져다 다른 아이디에 쓸 수 없음
+const APPROVAL_MSG = (code, id) => enc.encode('toeic-voca|v3|' + String(code).trim().toUpperCase() + '|' + String(id).trim().toLowerCase());
+// 관리자 키로 서명 키 잠금 해제 (틀리면 null)
+async function unlockSigningKey(adminKey) {
+  try {
+    const base = await crypto.subtle.importKey('raw', enc.encode(String(adminKey).trim().toUpperCase()), 'PBKDF2', false, ['deriveKey']);
+    const aes = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: fromB64u(SIGN_LOCK.salt), iterations: SIGN_LOCK.it, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+    return new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromB64u(SIGN_LOCK.iv) }, aes, fromB64u(SIGN_LOCK.ct)));
+  } catch (e) { return null; }
+}
+async function signApproval(code, id) {
+  const d = await Store.getMeta('signKey');
+  if (!d) return null;
+  const key = await crypto.subtle.importKey('jwk', { ...SIGN_PUB, d }, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']);
+  return b64u(await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, key, APPROVAL_MSG(code, id)));
+}
+async function verifyApproval(code, id, sig) {
+  try {
+    const key = await crypto.subtle.importKey('jwk', SIGN_PUB, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
+    return await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, fromB64u(sig), APPROVAL_MSG(code, id));
+  } catch (e) { return false; }
+}
+// 문자 내용을 통째로 붙여넣어도 승인 코드만 골라냄
+function extractApproval(text) { const m = String(text || '').match(/[A-Za-z0-9_-]{80,}/g); return m ? m.sort((a, b) => b.length - a.length)[0] : ''; }
+function newRequestCode() {
+  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', r = crypto.getRandomValues(new Uint8Array(6));
+  return [...r].map((x) => A[x % A.length]).join('');
+}
+const isPWA = () => !(window.claude && window.claude.use);   // Claude 안에서 열린 버전은 문자 링크가 안 열릴 수 있음
+
+async function enterApp(u) {
+  if (!u.admin && u.apv !== 2) {
+    // 보안 강화 이전에 승인된 계정은 새 방식으로 다시 승인받아야 함 (단어·기록은 그대로 보관)
+    S.user = null;
+    S.auth = { mode: 'signup', err: '', admin: S.auth.admin, req: { name: u.name, id: u.id, salt: u.salt, hash: u.hash, createdAt: u.createdAt, reapprove: true, code: newRequestCode(), expires: Date.now() + REQ_MINUTES * 60000, tries: 0 } };
+    render(); startReqTimer();
+    return;
+  }
+  S.user = u;
+  ADM.hasKey = !!(await Store.getMeta('signKey'));
+  await Store.setMeta('session', u.id);       // 이 기기에서 자동 로그인
+  try { localStorage.setItem('toeic-voca-session', u.id); } catch (e) {}   // 예비 저장
+  let all = [];
+  try { all = await Store.all(); } catch (e) {}
+  const orphan = all.filter((i) => !i.uid);     // 로그인 기능 이전에 저장한 단어는 이 기기의 첫 로그인 계정으로
+  if (orphan.length) { orphan.forEach((i) => (i.uid = u.id)); await Store.putMany(orphan).catch(() => {}); }
+  S.items = all.filter((i) => i.uid === u.id);
+  if (!S.items.length && Store.mode === 'idb') {
+    const back = Store.readMirror('toeic-voca-m-items:' + u.id).concat(Store.readMirror('toeic-voca-items').filter((i) => i && (i.uid === u.id || !i.uid)));
+    const ids = new Set(); const got = [];
+    for (const i of back) { if (i && i.id && i.term && !ids.has(i.id)) { ids.add(i.id); got.push({ ...i, uid: u.id }); } }
+    if (got.length) { await Store.putMany(got).catch(() => {}); S.items = got; setTimeout(() => toast(`예비 사본에서 단어 ${got.length}개를 되살렸어요`), 400); }
+  }
+  Store.mirrorItems();
+  const legacy = S.items.filter((i) => i.section !== 'LC' && i.section !== 'RC');
+  if (legacy.length) { legacy.forEach((i) => (i.section = 'RC')); Store.putMany(legacy).catch(() => {}); }
+  const savedScope = (await Store.getMeta('scope:' + u.id)) || {};
+  S.scope = { ...DEFAULT_SCOPE(), sec: savedScope.sec || 'all', kind: savedScope.kind || 'all', weak: !!savedScope.weak, days: Array.isArray(savedScope.days) ? savedScope.days : [] };
+  try { const dd = Number(localStorage.getItem('toeic-voca-day:' + u.id)); S.reg.day = dd >= 1 && dd <= MAX_DAY ? dd : null; } catch (e) {}
+  S.current = null; S.tab = 'study';
+  stopReqTimer();
+  render(true);
+}
+// 로그인 화면에서 백업 파일로 계정 + 단어 + 학습 기록 복구
+async function restoreFromBackup(file) {
+  if (!file) return;
+  let obj;
+  try { obj = JSON.parse(await file.text()); } catch (e) { toast('백업 파일을 읽지 못했어요'); return; }
+  const a = obj && obj.account;
+  if (!a || !a.id || !a.hash || !a.salt) { toast('이 백업에는 계정 정보가 없어요. 계정을 만든 뒤 단어장 메뉴에서 불러와 주세요.'); return; }
+  // 승인받은 계정인지 서명으로만 확인 (파일의 admin 값은 믿지 않음 → 관리자는 로그인 후 관리자 키로 다시 등록)
+  const apvOk = !!(a.apvCode && a.apvSig && (await verifyApproval(a.apvCode, a.id, a.apvSig)));
+  const exist = S.users.find((u) => u.id === a.id);
+  if (!exist) {
+    await Store.putUser({ id: a.id, name: a.name || a.id, salt: a.salt, hash: a.hash, admin: false, apv: apvOk ? 2 : undefined, apvCode: a.apvCode, apvSig: a.apvSig, createdAt: a.createdAt || Date.now() });
+    S.users = await Store.users(); Store._users = S.users;
+  }
+  const items = (Array.isArray(obj.items) ? obj.items : []).filter((i) => i && i.id && i.term && i.meaning).map((i) => ({ ...i, uid: a.id }));
+  if (items.length) { const had = new Set((await Store.all()).map((i) => i.id)); await Store.putMany(items.filter((i) => !had.has(i.id))); }
+  try { localStorage.setItem('toeic-voca-m-items:' + a.id, JSON.stringify(items)); } catch (e) {}
+  S.auth = { mode: 'login', err: '', req: null, admin: S.auth.admin };
+  render();
+  const idEl = document.getElementById('loginId'); if (idEl) idEl.value = a.id;
+  toast(`${a.name || a.id} 계정${exist ? '' : '을 복구하고'} 단어 ${items.length}개를 되살렸어요. 비밀번호로 로그인해 주세요.` + (!exist && !apvOk ? ' 로그인 후 한 번 승인을 받아야 해요.' : ''));
+}
+async function logout() {
+  await Store.setMeta('session', null);
+  try { localStorage.removeItem('toeic-voca-session'); } catch (e) {}
+  S.user = null; S.items = []; S.current = null; S.last = null;
+  S.auth = { mode: 'login', err: '', req: null, admin: S.auth.admin };
+  $layer.innerHTML = '';
+  render();
+}
+let reqTimer = null;
+function stopReqTimer() { if (reqTimer) { clearInterval(reqTimer); reqTimer = null; } }
+function startReqTimer() {
+  stopReqTimer();
+  reqTimer = setInterval(() => {
+    const R = S.auth.req; if (!R) return stopReqTimer();
+    const left = Math.max(0, R.expires - Date.now());
+    const el = document.getElementById('reqLeft');
+    if (el) el.textContent = `${Math.floor(left / 60000)}:${String(Math.floor(left / 1000) % 60).padStart(2, '0')}`;
+    if (!left) { stopReqTimer(); render(); }
+  }, 500);
+}
+function authField(id, label, attrs) {
+  return h('label', { class: 'af', for: id }, h('span', null, label), h('input', { id, class: 'ai', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', ...attrs }));
+}
+const val = (id) => (document.getElementById(id) || {}).value || '';
+
+function renderAuth() {
+  const A = S.auth;
+  const wrap = h('div', { class: 'scroll auth' });
+  wrap.append(h('div', { class: 'brand' }, h('div', { class: 'brand-word' }, h('span', { class: 'hl' }, 'voca')), h('h1', null, '토익 단어 암기'),
+    h('p', null, A.mode === 'signup' ? (A.req && A.req.reapprove ? '다시 승인받기' : '계정 만들기') : A.mode === 'admin' ? '관리자 · 가입 승인 번호 만들기' : '로그인하면 이 기기에서는 다음부터 자동으로 들어와요')));
+  const err = h('p', { class: 'aerr', role: 'alert', id: 'aerr', hidden: !A.err }, A.err || '');
+  // 오류는 화면을 다시 그리지 않고 그 자리에 표시 (입력한 내용 유지)
+  const setErr = (m) => { A.err = m; const el = document.getElementById('aerr'); if (el) { el.textContent = m; el.hidden = !m; } else render(); };
+
+  if (A.mode === 'login') {
+    const form = h('form', { class: 'panel aform', onsubmit: async (e) => {
+      e.preventDefault();
+      const id = val('loginId').trim().toLowerCase(), pw = val('loginPw');
+      if (!id || !pw) return setErr('아이디와 비밀번호를 입력해 주세요.');
+      const u = S.users.find((x) => x.id === id);
+      if (!u) return setErr(S.users.length ? '이 기기에 없는 아이디예요. 계정은 기기마다 따로 만들어요.' : '아직 이 기기에 만든 계정이 없어요. 아래에서 계정을 만들어 주세요.');
+      if ((await hashPw(pw, u.salt)) !== u.hash) return setErr('비밀번호가 맞지 않아요.');
+      A.err = ''; await enterApp(u);
+    } },
+      authField('loginId', '아이디', { autocomplete: 'username', placeholder: '아이디' }),
+      authField('loginPw', '비밀번호', { type: 'password', autocomplete: 'current-password', placeholder: '비밀번호' }),
+      err,
+      h('button', { class: 'btn primary', type: 'submit' }, '로그인'));
+    wrap.append(form,
+      h('div', { class: 'alinks' },
+        h('button', { class: 'btn ghost', onclick: () => { S.auth = { ...A, mode: 'signup', err: '', req: null }; render(); } }, '계정 만들기'),
+        h('label', { class: 'alink', style: 'position:relative;cursor:pointer' }, '백업 파일로 계정 복구',
+          h('input', { type: 'file', accept: '.json,application/json,text/plain', style: 'position:absolute;inset:0;opacity:0;width:100%', onchange: (e) => restoreFromBackup(e.target.files[0]) })),
+));
+    return wrap;
+  }
+
+  if (A.mode === 'signup') {
+    const back = h('button', { class: 'alink', onclick: () => { stopReqTimer(); S.auth = { ...A, mode: 'login', err: '', req: null }; render(); } }, '← 로그인으로 돌아가기');
+    if (!A.req) {
+      const d = A.draft || {};
+      const form = h('form', { class: 'panel aform', onsubmit: async (e) => {
+        e.preventDefault();
+        const name = val('suName').trim(), id = val('suId').trim().toLowerCase(), pw = val('suPw'), pw2 = val('suPw2');
+        A.draft = { name, id };
+        if (!name) return setErr('이름을 입력해 주세요.');
+        if (!/^[a-z0-9_.-]{4,20}$/.test(id)) return setErr('아이디는 영어 소문자·숫자로 4~20자로 만들어 주세요.');
+        if (S.users.some((x) => x.id === id)) return setErr('이 기기에 이미 있는 아이디예요.');
+        if (pw.length < 6) return setErr('비밀번호는 6자 이상으로 만들어 주세요.');
+        if (pw !== pw2) return setErr('비밀번호 재입력이 일치하지 않아요.');
+        const salt = toB64(crypto.getRandomValues(new Uint8Array(16)));
+        const ak = val('suAdminKey').trim();
+        if (ak) {
+          // 관리자: 관리자 키가 맞으면 문자 승인 없이 바로 가입
+          setErr('관리자 키 확인 중…');
+          const dkey = await unlockSigningKey(ak);
+          if (!dkey) return setErr('관리자 키가 맞지 않아요. 관리자가 아니면 칸을 비워 두세요.');
+          await Store.setMeta('signKey', dkey);
+          const u = { id, name, salt, hash: await hashPw(pw, salt), admin: true, apv: 2, createdAt: Date.now() };
+          await Store.putUser(u); S.users = await Store.users();
+          S.auth.admin.unlocked = true; await Store.setMeta('admin', true);
+          S.auth = { mode: 'login', err: '', req: null, admin: S.auth.admin };
+          toast(`관리자 ${name}님, 가입됐어요. 다음부터는 자동으로 로그인돼요.`);
+          return enterApp(u);
+        }
+        A.req = { name, id, salt, hash: await hashPw(pw, salt), code: newRequestCode(), expires: Date.now() + REQ_MINUTES * 60000, tries: 0 };
+        A.err = ''; render(); startReqTimer();
+      } },
+        authField('suName', '이름', { placeholder: '홍길동', value: d.name || '', autocomplete: 'name' }),
+        authField('suId', '아이디', { placeholder: '영어 소문자·숫자 4~20자', value: d.id || '' }),
+        authField('suPw', '비밀번호', { type: 'password', placeholder: '6자 이상', autocomplete: 'new-password' }),
+        authField('suPw2', '비밀번호 재입력', { type: 'password', placeholder: '한 번 더 입력', autocomplete: 'new-password' }),
+        h('details', { class: 'adm', open: !!A.adminSignup },
+          h('summary', null, '관리자 키가 있다면'),
+          authField('suAdminKey', '관리자 키', { type: 'password', placeholder: 'VOCA-XXXX-XXXX-XXXX' }),
+          h('p', { class: 'note', style: 'margin:4px 0 0' }, '키가 맞으면 문자 승인 없이 바로 가입돼요. 관리자가 아니면 비워 두세요.')),
+        err,
+        h('button', { class: 'btn primary', type: 'submit' }, '가입하기'),
+        h('p', { class: 'note', style: 'margin:2px 0 0' }, `다음 단계에서 관리자(${ADMIN_PHONE_VIEW})에게 요청 코드를 보내고, ${REQ_MINUTES}분 안에 받은 승인 코드를 붙여넣으면 가입돼요.`));
+      wrap.append(form, h('div', { class: 'alinks' }, back));
+      return wrap;
+    }
+    const R = A.req;
+    const left = Math.max(0, R.expires - Date.now());
+    const expired = left === 0;
+    const msg = `[토익 단어 암기] 가입 승인 요청\n이름: ${R.name}\n아이디: ${R.id}\n요청 코드: ${R.code}`;
+    // 다시 승인받는 관리자(백업 복구 등): 관리자 키로 바로 승인
+    const admBox = R.reapprove ? h('details', { class: 'adm' }, h('summary', null, '관리자 키가 있다면'),
+      h('form', { class: 'aform', style: 'padding:0', onsubmit: async (e) => {
+        e.preventDefault();
+        setErr('관리자 키 확인 중…');
+        const dkey = await unlockSigningKey(val('raAdminKey'));
+        if (!dkey) return setErr('관리자 키가 맞지 않아요.');
+        await Store.setMeta('signKey', dkey);
+        const prev = S.users.find((x) => x.id === R.id) || {};
+        const u = { ...prev, id: R.id, name: R.name, salt: R.salt, hash: R.hash, createdAt: R.createdAt || Date.now(), admin: true, apv: 2 };
+        await Store.putUser(u); S.users = await Store.users();
+        S.auth = { mode: 'login', err: '', req: null, admin: A.admin };
+        toast(`관리자 ${u.name}님, 다시 등록됐어요`);
+        await enterApp(u);
+      } }, authField('raAdminKey', '관리자 키', { type: 'password', placeholder: 'VOCA-XXXX-XXXX-XXXX' }), h('button', { class: 'btn ghost sm', type: 'submit' }, '관리자로 승인'))) : null;
+    const smsHref = `sms:${ADMIN_PHONE}&body=${encodeURIComponent(msg)}`;
+    const panel = h('div', { class: 'panel aform' },
+      R.reapprove ? h('p', { class: 'reapv' }, `${R.name}님, 보안 강화로 한 번 더 승인이 필요해요. 단어와 학습 기록은 그대로 남아 있어요.`) : null,
+      h('div', { class: 'reqbox' + (expired ? ' expired' : '') },
+        h('span', null, '요청 코드'), h('b', null, R.code),
+        h('span', { class: 'timer' }, expired ? '시간 초과' : h('span', null, '남은 시간 ', h('b', { id: 'reqLeft' }, `${Math.floor(left / 60000)}:${String(Math.floor(left / 1000) % 60).padStart(2, '0')}`)))),
+      h('ol', { class: 'steps', style: 'margin:4px 0 0' },
+        h('li', null, '관리자에게 ', h('b', null, '요청 코드'), '를 문자로 보내요.'),
+        h('li', null, '관리자가 답장으로 보내준 ', h('b', null, '승인 코드'), '(긴 문자)를 길게 눌러 복사한 뒤, 아래에 붙여넣어요.')),
+      isPWA()
+        ? [h('a', { class: 'btn ghost', href: smsHref }, '관리자에게 문자 보내기'), h('p', { class: 'note', style: 'margin:-4px 0 0;text-align:center' }, '받는 번호 ' + ADMIN_PHONE_VIEW + ' · 요청 코드가 자동으로 들어가요')]
+        : h('div', { class: 'phone' }, '관리자 번호 ', h('b', null, ADMIN_PHONE_VIEW), h('button', { class: 'btn ghost sm', onclick: async () => { try { await navigator.clipboard.writeText(msg); toast('요청 내용을 복사했어요. 문자로 보내 주세요.'); } catch (e) { toast('번호와 요청 코드를 직접 보내 주세요.'); } } }, '요청 내용 복사')),
+      expired
+        ? h('button', { class: 'btn primary', onclick: () => { R.code = newRequestCode(); R.expires = Date.now() + REQ_MINUTES * 60000; R.tries = 0; A.err = ''; render(); startReqTimer(); } }, '새 요청 코드 받기')
+        : h('form', { class: 'aform', style: 'padding:0', onsubmit: async (e) => {
+            e.preventDefault();
+            if (Date.now() > R.expires) return render();
+            const sig = extractApproval(val('suOtp'));
+            if (!sig) return setErr('승인 코드를 붙여넣어 주세요. 관리자가 보낸 문자 전체를 붙여넣어도 돼요.');
+            R.tries++;
+            if (!(await verifyApproval(R.code, R.id, sig))) {
+              if (R.tries >= 5) { R.expires = 0; A.err = '5번 틀려서 이 요청 코드는 막혔어요. 새 요청 코드를 받아 주세요.'; return render(); }
+              return setErr(`이 요청 코드(${R.code})의 승인 코드가 아니에요. (${R.tries}/5)`);
+            }
+            const prev = S.users.find((x) => x.id === R.id) || {};
+            const u = { ...prev, id: R.id, name: R.name, salt: R.salt, hash: R.hash, createdAt: R.createdAt || Date.now(), apv: 2, apvCode: R.code, apvSig: sig };   // 승인 증명 보관 (백업 복구 때 확인)
+            await Store.putUser(u); S.users = await Store.users();
+            S.auth = { mode: 'login', err: '', req: null, admin: A.admin };
+            toast(R.reapprove ? `${u.name}님, 다시 승인됐어요` : `${u.name}님, 가입을 환영해요!`);
+            await enterApp(u);
+          } },
+            h('label', { class: 'af', for: 'suOtp' }, h('span', null, '승인 코드'),
+              h('textarea', { id: 'suOtp', class: 'ai', rows: 3, placeholder: '관리자가 보낸 승인 코드(또는 문자 전체)를 붙여넣으세요', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', style: 'height:auto;padding:10px 14px;font-family:var(--f-num);font-size:13px;resize:none' })),
+            h('button', { class: 'btn ghost sm', type: 'button', onclick: async () => { try { const t = await navigator.clipboard.readText(); document.getElementById('suOtp').value = t; } catch (e) { toast('입력칸을 길게 눌러 붙여넣기 해 주세요'); } } }, '복사한 내용 붙여넣기'),
+            err,
+            h('button', { class: 'btn primary', type: 'submit' }, R.reapprove ? '다시 승인받기' : '가입 완료')),
+      admBox);
+    wrap.append(panel, h('div', { class: 'alinks' }, back));
+    return wrap;
+  }
+
+  S.auth.mode = 'login';
+  return renderAuth();
+}
+
+/* ---------- 관리자 화면 (관리자 계정에만 보임) ---------- */
+const ADM = { code: '', id: '', result: '', history: [] };
+function renderAdmin() {
+  const wrap = h('div', { class: 'scroll' });
+  wrap.append(h('h1', { class: 'h1' }, '관리자', h('small', { class: 'who' }, S.user.name + '님')));
+  if (!ADM.hasKey) {
+    // 보안 강화 전에 만든 관리자 계정: 서명 키를 한 번 불러와야 함
+    const msg = h('p', { class: 'aerr', hidden: true });
+    wrap.append(h('div', { class: 'section' }, h('h3', null, '가입 승인'), h('form', { class: 'panel aform', onsubmit: async (e) => {
+      e.preventDefault();
+      msg.textContent = '확인 중…'; msg.hidden = false;
+      const d = await unlockSigningKey(val('admKey'));
+      if (!d) { msg.textContent = '관리자 키가 맞지 않아요.'; return; }
+      await Store.setMeta('signKey', d); ADM.hasKey = true; render();
+    } },
+      h('p', { class: 'note', style: 'margin:0' }, '보안이 강화돼서, 이 기기에서 관리자 키를 한 번만 다시 입력해 주세요.'),
+      authField('admKey', '관리자 키', { type: 'password', placeholder: 'VOCA-XXXX-XXXX-XXXX' }), msg,
+      h('button', { class: 'btn primary', type: 'submit' }, '확인'))));
+  } else {
+    const smsText = ADM.result ? `[토익 단어 암기] 승인 코드 (요청 ${ADM.code} · 아이디 ${ADM.id})\n${ADM.result}` : '';
+    const out = h('div', { class: 'reqbox', hidden: !ADM.result },
+      h('span', null, ADM.code ? `${ADM.id} · 요청 코드 ${ADM.code}의 승인 코드` : ''), h('code', { class: 'sigbox', id: 'admResult' }, ADM.result || ''),
+      h('button', { class: 'btn primary sm', onclick: async () => { try { await navigator.clipboard.writeText(smsText); toast('복사했어요. 신청자에게 문자로 보내 주세요.'); } catch (e) { toast('승인 코드를 길게 눌러 복사해 주세요'); } } }, '문자로 보낼 내용 복사'));
+    const form = h('form', { class: 'aform', onsubmit: async (e) => {
+      e.preventDefault();
+      // 신청 문자 전체를 요청 코드 칸에 붙여넣어도 아이디·코드를 골라냄
+      const raw = val('admCode'), mId = raw.match(/아이디\s*[:：]\s*([a-z0-9_.-]{4,20})/i), mCode = raw.match(/요청\s*코드\s*[:：]\s*([A-Za-z0-9]{6})/);
+      const code = (mCode ? mCode[1] : raw).trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const id = (val('admId').trim() || (mId ? mId[1] : '')).toLowerCase();
+      if (code.length !== 6) { toast('요청 코드 6자리를 입력해 주세요'); return; }
+      if (!/^[a-z0-9_.-]{4,20}$/.test(id)) { toast('신청자 아이디를 입력해 주세요 (신청 문자에 있어요)'); return; }
+      const sig = await signApproval(code, id);
+      if (!sig) { ADM.hasKey = false; render(); return; }
+      ADM.code = code; ADM.id = id; ADM.result = sig;
+      ADM.history = [{ code, id, at: Date.now() }].concat(ADM.history.filter((x) => x.code !== code)).slice(0, 5);
+      render();
+    } },
+      authField('admCode', '신청자에게 받은 요청 코드', { placeholder: '예: K7QM2D (문자 전체 붙여넣기 가능)', value: ADM.code, style: 'text-transform:uppercase;font-family:var(--f-num);letter-spacing:.1em' }),
+      authField('admId', '신청자 아이디', { placeholder: '신청 문자의 아이디', value: ADM.id, maxlength: '20' }),
+      h('button', { class: 'btn primary', type: 'submit' }, '승인 코드 만들기'));
+    wrap.append(h('div', { class: 'section' }, h('h3', null, '가입 승인'),
+      h('div', { class: 'panel aform' }, form, out,
+        h('p', { class: 'note', style: 'margin:0' }, '승인 코드는 이 폰에서만 만들 수 있는 전자서명이에요. 신청자 문자에 답장으로 붙여넣어 보내면, 신청자가 5분 안에 붙여넣어야 가입돼요.'))));
+    if (ADM.history.length) wrap.append(h('div', { class: 'section' }, h('h3', null, '최근 승인한 요청 코드'),
+      h('div', { class: 'list' }, ADM.history.map((x) => h('div', { class: 'li', style: 'grid-template-columns:minmax(0,1fr) auto;padding-left:14px' },
+        h('span', { style: 'font-family:var(--f-num);font-weight:600' }, x.code, x.id ? h('small', { style: 'font-weight:400;color:var(--muted);margin-left:6px' }, x.id) : null), h('span', { class: 'r' }, new Date(x.at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })))))));
+  }
+  const accList = h('div', { class: 'list' }, S.users.map((u) => h('div', { class: 'li', style: 'grid-template-columns:minmax(0,1fr) auto;padding-left:14px' },
+    h('span', { style: 'min-width:0' }, h('div', { class: 't', style: 'font-family:var(--f-ui);font-size:15px' }, u.name), h('div', { class: 'm' }, u.id)),
+    h('span', { class: 'badge ' + (u.admin ? 'sec-LC' : 'example'), style: 'font-size:11px' }, u.admin ? '관리자' : u.apv === 2 ? '사용자' : '재승인 필요'))));
+  wrap.append(h('div', { class: 'section' }, h('h3', null, '이 기기의 계정'), accList,
+    h('p', { class: 'note' }, '계정은 기기마다 따로 저장돼요. 다른 사람의 계정은 그 사람 폰에만 있어요.')));
+  return wrap;
+}
+function openAdminKey() {
+  openSheet((close) => {
+    const inp = h('input', { class: 'ai', id: 'promoteKey', type: 'password', placeholder: 'VOCA-XXXX-XXXX-XXXX', autocomplete: 'off' });
+    const msg = h('p', { class: 'aerr', hidden: true });
+    return h('form', { onsubmit: async (e) => {
+      e.preventDefault();
+      msg.textContent = '확인 중…'; msg.hidden = false;
+      const d = await unlockSigningKey(inp.value);
+      if (!d) { msg.textContent = '관리자 키가 맞지 않아요.'; return; }
+      await Store.setMeta('signKey', d); ADM.hasKey = true;
+      S.user.admin = true; S.user.apv = 2; await Store.putUser(S.user); S.users = await Store.users();
+      close(); S.tab = 'admin'; render(true); toast('관리자로 등록됐어요. 관리자 탭이 생겼어요.');
+    } },
+      h('h2', null, '관리자 키 등록', h('button', { class: 'iconbtn', type: 'button', html: I.x, 'aria-label': '닫기', onclick: close })),
+      h('div', { class: 'aform' }, inp, msg, h('button', { class: 'btn primary', type: 'submit' }, '등록'),
+        h('p', { class: 'note', style: 'margin:0' }, '등록하면 이 계정에 관리자 탭이 생기고, 키는 다시 묻지 않아요.')));
+  });
+}
+
+/* ================= 출제 로직 ================= */
+/* ---------- 암기 범위 · 일차 ---------- */
+const MAX_DAY = 11;
+const DAYS = Array.from({ length: MAX_DAY }, (_, i) => i + 1);
+const DEFAULT_SCOPE = () => ({ sec: 'all', kind: 'all', weak: false, days: [] });
+const dayOf = (i) => { const n = Number(i && i.day); return n >= 1 && n <= MAX_DAY ? n : 0; };   // 0 = 일차 미지정
+const dayLabel = (n) => (n ? `${n}일차` : '일차 미지정');
+function dayGroups(items) {
+  const map = new Map();
+  for (const i of items) { const k = dayOf(i); const g = map.get(k) || { key: k, count: 0, solved: 0 }; g.count++; if (i.attempts > 0) g.solved++; map.set(k, g); }
+  return [...map.values()].sort((a, b) => (a.key || 99) - (b.key || 99));   // 1일차 → 11일차 → 미지정
+}
+function inScope(i, sc) {
+  sc = sc || S.scope;
+  if (sc.sec !== 'all' && secOf(i) !== sc.sec) return false;
+  if (sc.kind !== 'all' && i.kind !== sc.kind) return false;
+  if (sc.weak) { const a = accOf(i); if (a == null || a >= 0.6) return false; }
+  if (sc.days.length && !sc.days.includes(dayOf(i))) return false;
+  return true;
+}
+const scopeActive = (sc) => { sc = sc || S.scope; return sc.sec !== 'all' || sc.kind !== 'all' || sc.weak || sc.days.length > 0; };
+function scopeSummary(sc) {
+  sc = sc || S.scope;
+  const parts = [];
+  if (sc.days.length) {
+    const d = sc.days.slice().sort((a, b) => (a || 99) - (b || 99));
+    parts.push(d.length <= 3 ? d.map((n) => (n ? n : '미지정')).join('·') + (d.every((n) => n) ? '일차' : '') : `${dayLabel(d[0])} 외 ${d.length - 1}개`);
+  }
+  if (sc.sec !== 'all') parts.push(SEC[sc.sec]);
+  if (sc.kind !== 'all') parts.push(sc.kind === 'word' ? '단어' : '예문');
+  if (sc.weak) parts.push('취약');
+  return parts.join(' · ');
+}
+async function saveScope() { if (S.user) await Store.setMeta('scope:' + S.user.id, S.scope); }
+function openScope() {
+  const draft = JSON.parse(JSON.stringify(S.scope));
+  openSheet((close) => {
+    const body = h('div');
+    const paint = () => {
+      body.innerHTML = '';
+      const pool = S.items.filter((i) => inScope(i, draft));
+      const seg = (key, opts) => h('div', { class: 'seg seg3' }, opts.map(([v, lab]) => h('button', { 'aria-pressed': String(draft[key] === v), onclick: () => { draft[key] = v; paint(); } }, lab)));
+      // 1. 일차 (다른 조건을 적용한 개수로 표시) → 2. L/C·R/C → 3. 단어/예문 → 4. 취약
+      const base = S.items.filter((i) => inScope(i, { ...draft, days: [] }));
+      const counts = new Map(dayGroups(base).map((g) => [g.key, g]));
+      const allDays = !draft.days.length;
+      const dayBtn = (n) => {
+        const g = counts.get(n), on = draft.days.includes(n);
+        return h('button', { class: 'dcell' + (on ? ' on' : ''), disabled: !g && !on, onclick: () => { draft.days = on ? draft.days.filter((k) => k !== n) : draft.days.concat(n); paint(); } },
+          h('b', null, n ? `${n}일차` : '미지정'), h('small', null, g ? `${g.count}개` : '0'));
+      };
+      body.append(
+        h('div', { class: 'form-l', style: 'margin-top:0;display:flex;justify-content:space-between;align-items:center' }, h('span', null, '일차 (여러 개 선택 가능)'),
+          allDays ? h('span', null, '전체 일차') : h('button', { class: 'alink', style: 'padding:0', onclick: () => { draft.days = []; paint(); } }, '전체 일차로')),
+        h('div', { class: 'dgrid' }, DAYS.map(dayBtn), counts.has(0) ? dayBtn(0) : null),
+        h('div', { class: 'form-l' }, '단어장'), seg('sec', [['all', '전체'], ['LC', 'L/C'], ['RC', 'R/C']]),
+        h('div', { class: 'form-l' }, '구분'), seg('kind', [['all', '전체'], ['word', '단어'], ['example', '예문']]),
+        h('div', { class: 'toggle', style: 'margin:14px 2px 0;justify-content:space-between' }, '취약 단어만 (정답률 60% 미만)',
+          h('button', { class: 'switch', role: 'switch', 'aria-checked': String(draft.weak), 'aria-label': '취약 단어만', onclick: () => { draft.weak = !draft.weak; paint(); } })),
+        h('div', { class: 'scopefoot' },
+          h('span', null, '선택한 범위 ', h('b', null, `${pool.length}개`), pool.length ? ` · 풀이 ${pool.filter((i) => i.attempts > 0).length}` : ''),
+          h('div', { class: 'row-btns', style: 'margin:0' },
+            h('button', { class: 'btn ghost sm', onclick: () => { Object.assign(draft, DEFAULT_SCOPE()); paint(); } }, '초기화'),
+            h('button', { class: 'btn primary sm', disabled: !pool.length, onclick: async () => { S.scope = draft; await saveScope(); S.current = null; S.revealed = false; close(); render(true); toast(scopeActive() ? `범위: ${scopeSummary()} (${pool.length}개)` : '전체 단어로 암기해요'); } }, '이 범위로 암기'))));
+    };
+    paint();
+    return h('div', null, h('h2', null, '암기 범위', h('button', { class: 'iconbtn', html: I.x, 'aria-label': '닫기', onclick: close })), body);
+  });
+}
+
+const W_MIN = 1e-4, W_MAX = 4, DAY_MS = 864e5;
+// 실제 출제 비중: 맞혀서 낮아진 비중은 시간이 지나면 다시 1로 회복 (간격 반복)
+// 연속 정답 n번 ≈ 비중 ½ⁿ → 1·2·4·8·16일(최대 30일)에 걸쳐 회복. 저장된 weight 값은 바꾸지 않음
+function effWeight(it) {
+  const w = Math.min(Math.max(+it.weight || 1, W_MIN), W_MAX);
+  if (w >= 1 || !it.lastSeen) return w;
+  const n = Math.log2(1 / w);
+  const span = Math.min(30, 2 ** Math.max(0, n - 1)) * DAY_MS;
+  return w + (1 - w) * Math.min(1, Math.max(0, Date.now() - it.lastSeen) / span);
+}
+function pickNext() {
+  const items = S.items.filter((i) => inScope(i));
+  if (!items.length) { S.current = null; return; }
+  let pool = items;
+  if (items.length > 1 && S.current) pool = items.filter((i) => i.id !== S.current.id);
+  const ws = pool.map(effWeight);
+  let r = Math.random() * ws.reduce((a, w) => a + w, 0);
+  for (let k = 0; k < pool.length; k++) { r -= ws[k]; if (r < 0) { S.current = pool[k]; return; } }
+  S.current = pool[pool.length - 1];
+}
+async function answer(ok) {
+  const it = S.current; if (!it) return;
+  S.last = { id: it.id, prev: { weight: it.weight, attempts: it.attempts, correct: it.correct, lastSeen: it.lastSeen } };
+  it.attempts += 1; it.lastSeen = Date.now();
+  // O → 비중 ½ (시간이 지나면 회복), X → 최소 1로 되돌리고 2배 (최대 4)
+  if (ok) { it.correct += 1; it.weight = Math.max(it.weight * 0.5, W_MIN); }
+  else it.weight = Math.min(W_MAX, Math.max(1, it.weight * 2));
+  Store.put(it).catch(() => showWarn('기록을 저장하지 못했어요.'));
+  const card = document.querySelector('.qcard');
+  if (card) card.classList.add(ok ? 'flash-ok' : 'flash-no');
+  setTimeout(() => {
+    S.revealed = false; pickNext(); render(true);
+    toast(ok ? 'O 기록됨' : 'X 기록됨', { label: '되돌리기', fn: undo });
+  }, 170);
+}
+function undo() {
+  if (!S.last) return;
+  const it = S.items.find((i) => i.id === S.last.id); if (!it) return;
+  Object.assign(it, S.last.prev); Store.put(it).catch(() => showWarn('기록을 저장하지 못했어요.'));
+  S.current = it; S.revealed = false; S.last = null; render(true);
+}
+function speak(text) {
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.9;
+    const v = speechSynthesis.getVoices().find((x) => x.lang === 'en-US'); if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  } catch (e) { toast('이 화면에서는 발음 재생이 지원되지 않아요'); }
+}
+
+/* ================= 암기 화면 ================= */
+// ---------- 예문 형광펜: 영어 문장의 표제어/숙어 ↔ 한글 해석의 해당 뜻 ----------
+const escRe = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// 단어 뜻 "(명) 상품, 제품" → ["상품", "제품"]
+function koCandidates(meaning) {
+  const m = (meaning || '')
+    .replace(/\[[^\]]*\]/g, ' ').replace(/\(\s*=[^)]*\)/g, ' ').replace(/[≠=][^,;/]*/g, ' ')
+    .replace(/\(?\s*(명|동|형|부|전|접|대)\s*\)\s*/g, ' ')
+    .replace(/\b(n|v|vt|vi|adj|adv|a|ad|prep|conj|pron|phr)\.\s*/gi, ' ')
+    .replace(/\([가-힣\s~]*\)/g, ' ').replace(/[()~]/g, ' ');
+  return m.split(/[,;/·]+/).map((x) => x.replace(/[^가-힣\s]/g, '').replace(/\s+/g, ' ').trim()).filter((x) => x.replace(/ /g, '').length >= 2);
+}
+// 어미를 뗀 줄기 + (3글자 이상이면) 앞·뒤 두 글자
+function koStems(c) {
+  const out = [];
+  const st = c.replace(/(시키다|하다|되다|하는|되는|적인|이다|한|된|적|의|히|다)$/, '').trim();
+  if (st !== c && st.replace(/ /g, '').length >= 2) out.push({ t: st, extend: true });       // 활용 어미까지 표시
+  const core = st.replace(/ /g, '');
+  if (core.length >= 3) out.push({ t: core.slice(0, 2), extend: false }, { t: core.slice(-2), extend: false });   // 조사는 빼고 표시
+  return out;
+}
+function findKo(trans, cands) {
+  for (const c of cands) { const i = trans.indexOf(c); if (i >= 0) return [i, i + c.length]; }       // 뜻 그대로
+  for (const c of cands) for (const st of koStems(c)) {                                               // 활용형 (면제하다 → 면제됩니다)
+    const i = trans.indexOf(st.t);
+    if (i >= 0) { let e = i + st.t.length; if (st.extend) while (e < trans.length && /[가-힣]/.test(trans[e])) e++; return [i, e]; }
+  }
+  return null;
+}
+function exampleHighlight(it) {
+  const sent = it.term, low = sent.toLowerCase(), sec = secOf(it);
+  const words = S.items.filter((w) => w.kind === 'word' && secOf(w) === sec);
+  const base = (w) => w.term.replace(/\([^)]*\)/g, '').replace(/~/g, '').trim().toLowerCase();
+  let cands = words.filter((w) => base(w).length >= 3 && new RegExp('\\b' + escRe(base(w))).test(low));
+  const head = it.ref ? words.find((w) => w.term.toLowerCase() === it.ref.toLowerCase()) : null;
+  if (head && !cands.includes(head)) cands.push(head);
+  cands.sort((a, b) => base(b).length - base(a).length);   // 긴 숙어부터 (promotional merchandise > merchandise)
+  const enRange = (w) => {
+    const b = base(w);
+    let m = new RegExp('\\b' + escRe(b) + '[a-z]*', 'i').exec(sent);
+    if (!m && b.length > 4 && !b.includes(' ')) m = new RegExp('\\b' + escRe(b.slice(0, Math.max(4, b.length - 2))) + '[a-z]*', 'i').exec(sent);
+    return m ? [m.index, m.index + m[0].length] : null;
+  };
+  let en = null, ko = null;
+  for (const w of cands) {
+    const e = enRange(w), k = findKo(it.meaning, koCandidates(w.meaning));
+    if (e && k) return { en: e, ko: k };
+    if (!en && e) en = e;
+    if (!ko && k) ko = k;
+  }
+  if (!en && it.ref) en = enRange({ term: it.ref });
+  return { en, ko };
+}
+function markRange(text, range) {
+  const frag = document.createDocumentFragment();
+  if (!range) { frag.append(text); return frag; }
+  frag.append(text.slice(0, range[0]), h('span', { class: 'hl' }, text.slice(range[0], range[1])), text.slice(range[1]));
+  return frag;
+}
+function renderStudy(animate) {
+  if (!S.items.length) {
+    return h('div', { class: 'empty' },
+      h('div', { class: 'mock' }, h('span', { class: 'hl' }, 'steadily')),
+      h('h2', null, '아직 등록된 단어가 없어요'),
+      h('p', null, '단어장 페이지를 사진으로 찍거나 텍스트를 붙여넣으면 바로 암기를 시작할 수 있어요.'),
+      h('button', { class: 'btn primary', onclick: () => go('add') }, h('span', { html: I.camera }), '단어 등록하기'),
+      h('button', { class: 'btn ghost sm', onclick: loadSampleToStudy }, '예시 단어 10개로 둘러보기'));
+  }
+  if (!S.current || !S.items.includes(S.current) || !inScope(S.current)) pickNext();
+  const pool = S.items.filter((i) => inScope(i));
+  const solved = pool.filter((i) => i.attempts > 0).length;
+  if (!S.current) {
+    return h('div', { class: 'empty' },
+      h('h2', null, '이 범위에는 암기할 단어가 없어요'),
+      h('p', null, scopeSummary() ? `지금 범위: ${scopeSummary()}` : ''),
+      h('button', { class: 'btn primary', onclick: openScope }, '범위 바꾸기'),
+      h('button', { class: 'btn ghost sm', onclick: async () => { S.scope = DEFAULT_SCOPE(); await saveScope(); render(true); } }, '전체 단어로 보기'));
+  }
+  const it = S.current;
+  const acc = accOf(it);
+  const isEx = it.kind === 'example';
+  const marks = isEx ? exampleHighlight(it) : null;
+
+  const hdr = h('div', { class: 'hdr' },
+    h('div', { class: 'countcol' },
+      h('button', { class: 'count' + (scopeActive() ? ' scoped' : ''), onclick: openScope, 'aria-label': `암기 범위 ${pool.length}개 중 ${solved}개 풀이, 눌러서 범위 선택` }, String(solved), h('small', null, '/' + pool.length), h('span', { class: 'caret', html: '<svg viewBox="0 0 12 12"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' })),
+      scopeActive() ? h('span', { class: 'scopecap' }, scopeSummary()) : null),
+    acc != null
+      ? h('div', { class: 'acc' }, h('div', { class: 'lab' }, '정답률'), h('div', { class: 'val', style: `color:${acc >= .8 ? 'var(--ok)' : acc >= .5 ? 'var(--ex)' : 'var(--no)'}` }, pct(acc)), h('div', { class: 'sub' }, `${it.correct}/${it.attempts}회`))
+      : h('div', { class: 'acc' }, h('span', { class: 'tagnew' }, it.attempts === 0 ? 'NEW' : '1회 풀이')),
+    h('div', { class: 'hdr-right' }, h('button', { class: 'speak', 'aria-label': '발음 듣기', html: I.speak, onclick: () => speak(it.term) })));
+  // 단어/예문 바로 전환 (암기 범위의 '구분'과 같은 설정)
+  const kindSwitch = h('div', { class: 'kindsw', role: 'group', 'aria-label': '단어/예문 선택' },
+    [['all', '전체'], ['word', '단어'], ['example', '예문']].map(([k, lab]) => h('button', { 'aria-pressed': String(S.scope.kind === k), onclick: async () => {
+      if (S.scope.kind === k) return;
+      const next = { ...S.scope, kind: k };
+      const n = S.items.filter((i) => inScope(i, next)).length;
+      if (!n) { toast(`지금 범위에는 ${lab === '전체' ? '' : lab + ' '}항목이 없어요`); return; }
+      S.scope = next; await saveScope(); S.current = null; S.revealed = false; render(true);
+    } }, lab)));
+  const badgeRow = h('div', { class: 'badge-row' }, kindSwitch, h('span', { class: 'badge sec-' + secOf(it) }, SEC[secOf(it)]));
+
+  const q = h('section', { class: 'qcard' + (animate ? ' enter' : ''), 'aria-live': 'polite' },
+    isEx ? h('div', { class: 'term-ex' + (it.term.length > 120 ? ' long' : '') }, markRange(it.term, marks.en))
+         : h('div', { class: 'term-word' }, h('span', { class: 'hl' }, it.term)));
+
+  const a = h('section', { class: 'acard' + (S.revealed ? ' open' : ''), role: 'button', tabindex: '0', 'aria-label': '뜻 보기',
+      onclick: () => { S.revealed = !S.revealed; render(); },
+      onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); S.revealed = !S.revealed; render(); } } },
+    S.revealed
+      ? [h('div', { class: 'meaning' + (isEx ? ' ex' : '') }, isEx ? markRange(it.meaning, marks.ko) : it.meaning), isEx && it.ref ? h('div', { class: 'ref' }, '핵심 단어 ', h('b', null, it.ref)) : null]
+      : h('div', { class: 'hint' }, h('span', { html: I.tap }), '탭해서 뜻 보기'));
+
+  const ox = h('div', { class: 'ox' },
+    h('button', { class: 'oxb o', onclick: () => answer(true), 'aria-label': 'O 알아요' }, h('span', { class: 'big' }, 'O'), h('span', { class: 'sm' }, '알아요')),
+    h('button', { class: 'oxb x', onclick: () => answer(false), 'aria-label': 'X 몰라요' }, h('span', { class: 'big' }, 'X'), h('span', { class: 'sm' }, '몰라요')));
+
+  return h('div', { class: 'study' }, hdr, badgeRow, q, a, ox);
+}
+
+/* ================= 등록 화면 ================= */
+const SAMPLE = `1. allocate 할당하다, 배분하다
+The manager allocated additional funds to the marketing department.
+매니저는 마케팅 부서에 추가 자금을 할당했다.
+2. comply (with) 준수하다, 따르다
+All employees must comply with the new safety regulations.
+모든 직원은 새 안전 규정을 준수해야 한다.
+3. tentative 잠정적인, 임시의
+We have set a tentative date for the product launch.
+우리는 제품 출시를 위한 잠정적인 날짜를 정했다.
+4. reimburse 상환하다, 변제하다
+The company will reimburse employees for their travel expenses.
+회사는 직원들에게 출장 경비를 상환해 줄 것이다.
+5. prominent 유명한, 두드러진
+The conference featured several prominent speakers from the industry.
+그 회의에는 업계의 여러 유명 연사들이 참석했다.`;
+
+const SAMPLE_LC = `1 reservation  (명) 예약
+> make a reservation  예약하다
+I'd like to make a reservation for two at seven.  7시에 두 명 예약하고 싶어요.
+2 advertise  (동) 광고하다
+> advertise a product  제품을 광고하다
+The company advertised its new service on the radio.  그 회사는 라디오에 새 서비스를 광고했다.`;
+async function loadSampleToStudy() {
+  const entries = VocabParser.parse(SAMPLE).filter((e) => e.include).map((e) => ({ ...e, section: 'RC', day: 1 }));
+  const n = (await saveEntries(entries)).added;
+  toast(`예시 ${n}개를 넣었어요. 단어장 탭에서 언제든 지울 수 있어요.`);
+  render(true);
+}
+
+function renderAdd() {
+  const R = S.reg;
+  const wrap = h('div', { class: 'scroll' });
+  wrap.append(h('h1', { class: 'h1' }, '단어 등록'));
+  const isLC = R.section === 'LC';
+
+  // 1) 일차 선택 (저장에 필요)
+  wrap.append(h('div', { class: 'panel daypick', id: 'dayPick' },
+    h('div', { class: 'dp-head' }, h('b', null, '몇 일차 단어인가요?'), h('span', { class: 'note', style: 'margin:0' }, R.day ? `${R.day}일차로 저장돼요` : '저장하려면 일차를 골라 주세요')),
+    h('div', { class: 'dp-grid', role: 'group', 'aria-label': '일차 선택' }, DAYS.map((n) => h('button', { 'aria-pressed': String(R.day === n), 'aria-label': `${n}일차`, onclick: () => { setDay(n); render(); } }, String(n))))));
+
+  // 2) 직접 입력
+  const addManual = () => { R.entries.push({ term: '', meaning: '', kind: 'word', section: R.section, include: true }); render(); setTimeout(() => { const t = document.querySelectorAll('.entry .fld.term'); if (t.length) { t[t.length - 1].focus(); t[t.length - 1].scrollIntoView({ block: 'center' }); } }, 60); };
+  wrap.append(h('div', { class: 'section' }, h('h3', null, '직접 입력'),
+    h('button', { class: 'unified', onclick: addManual },
+      h('span', { class: 'cc-ic plain', html: I.plus }),
+      h('span', { class: 'u-text' }, h('b', null, '단어 직접 입력하기'), h('span', null, '영어와 뜻을 써서 한 개씩 추가해요')))));
+
+  // 3) 통합 등록 (Claude): L/C·R/C를 사진마다 자동 판단
+  const claudeInput = h('input', { type: 'file', accept: 'image/*', multiple: true, 'aria-label': '통합 등록할 사진 선택', onchange: (e) => onFiles(e.target.files, 'claude') });
+  const openText = () => { R.showText = true; render(); setTimeout(() => { const t = document.getElementById(R.split && isLC ? 'enText' : 'rawText'); if (t) { t.focus(); t.scrollIntoView({ block: 'center' }); } }, 50); };
+  if (CL.sample) {
+    wrap.append(h('div', { class: 'section' }, h('h3', null, '사진으로 등록'), h('label', { class: 'unified' },
+      h('span', { class: 'cc-ic', html: I.spark }),
+      h('span', { class: 'u-text' }, h('b', null, '통합 등록'), h('span', null, '사진만 올리면 Claude가 L/C·R/C를 알아서 나눠서 정리해요')),
+      h('span', { class: 'rec', style: 'position:static' }, '가장 정확'), claudeInput)));
+  } else {
+    wrap.append(h('div', { class: 'section' }, h('h3', null, '사진으로 등록'), h('div', { class: 'panel claude-card' },
+      h('div', { class: 'cc-head' }, h('span', { class: 'cc-ic', html: I.spark }), h('div', null, h('b', null, '통합 등록 (Claude 앱)'), h('span', { class: 'rec', style: 'position:static;margin-left:6px' }, '가장 정확'),
+        h('p', { class: 'note', style: 'margin:2px 0 0' }, 'L/C·R/C를 고를 필요 없어요. 사진마다 Claude가 형식을 판단하고, 여러 줄 예문과 표의 좌우 칸도 정확히 짝지어요.'))),
+      h('ol', { class: 'steps' },
+        h('li', null, h('b', null, '요청 문구 복사'), '를 눌러요.'),
+        h('li', null, h('b', null, 'Claude 앱'), '에서 새 대화를 열고, 단어장 ', h('b', null, '사진을 첨부'), '(L/C·R/C 섞여도 돼요)한 뒤 문구를 붙여넣어 보내요.'),
+        h('li', null, '답변의 코드 블록 오른쪽 위 ', h('b', null, '복사'), '를 눌러요.'),
+        h('li', null, h('b', null, '결과 붙여넣기'), '를 눌러 붙여넣고 ', h('b', null, '분석하기'), '를 누르면 그대로 들어와요.')),
+      h('div', { class: 'row-btns' }, h('button', { class: 'btn primary sm', onclick: copyPrompt }, '요청 문구 복사'), h('button', { class: 'btn ghost sm', onclick: openText }, '결과 붙여넣기')))));
+  }
+
+  // 4) 다른 방법: 형식(L/C·R/C)을 골라 기기에서 인식 / 텍스트 붙여넣기
+  const fileInput = h('input', { type: 'file', accept: 'image/*', multiple: true, 'aria-label': '기기에서 인식할 사진 선택', onchange: (e) => onFiles(e.target.files, 'device') });
+  wrap.append(h('div', { class: 'section' }, h('h3', null, '다른 방법 (형식을 골라서)'),
+    h('div', { class: 'seg secseg', role: 'group', 'aria-label': '단어장 종류' },
+      [['LC', 'L/C 단어장', '표 형식'], ['RC', 'R/C 단어장', 'R/C Vocab']].map(([k, lab, sub2]) =>
+        h('button', { 'data-sec': k, 'aria-pressed': String(R.section === k), onclick: () => { setSection(k); render(); } }, h('b', null, lab), h('small', null, sub2)))),
+    h('div', { class: 'sources', style: 'margin-top:12px' },
+      h('label', { class: 'src' }, h('div', { class: 'ic', html: I.camera }), h('b', null, '기기에서 인식'), h('span', null, isLC ? '왼쪽·오른쪽 칸을\n줄마다 자동으로 짝지음' : '촬영 또는 앨범 선택\n여러 장 가능'), fileInput),
+      h('button', { class: 'src', onclick: openText }, h('div', { class: 'ic', html: I.text }), h('b', null, '텍스트 붙여넣기'), h('span', null, '아이폰 텍스트 인식으로\n복사한 내용'))),
+    h('details', { class: 'tip', style: 'margin-top:12px' },
+      h('summary', null, isLC ? '표 형식(L/C) 기기 인식 요령' : '아이폰 텍스트 인식으로 더 정확하게'),
+      isLC
+        ? h('ol', { class: 'steps' },
+            h('li', null, h('b', null, '기기에서 인식'), '은 영어 칸과 한국어 칸을 같은 줄끼리 자동으로 짝지어요.'),
+            h('li', null, '아이폰 텍스트 인식으로 복사해 붙여넣어도 돼요. 칸이 따로 읽혀도 순서대로 짝지어요.'),
+            h('li', null, '짝이 어긋나면 붙여넣기 화면에서 ', h('b', null, '칸 따로 붙여넣기'), '를 켜고, 사진 앱 ', h('b', null, '편집 → 자르기'), '로 왼쪽·오른쪽 칸을 따로 복사해 넣어요.'))
+        : h('ol', { class: 'steps' },
+            h('li', null, h('b', null, '사진'), ' 앱에서 단어장 사진을 열고 글자를 ', h('b', null, '길게 눌러요'), '.'),
+            h('li', null, h('b', null, '전체 선택'), ' → ', h('b', null, '복사'), ' 후 ', h('b', null, '텍스트 붙여넣기'), '에 붙여넣고 ', h('b', null, '분석하기'), '를 눌러요.')))));
+
+  if (R.cur && !R.busy) wrap.append(renderCrop());
+
+  if (R.busy) wrap.append(h('div', { class: 'section' }, h('div', { class: 'panel' },
+    h('div', { class: 'status' }, h('span', { class: 'spin' }), R.status),
+    h('div', { class: 'prog' }, h('i', { style: `width:${Math.round(R.progress * 100)}%` })),
+    R.claude
+      ? h('div', { class: 'row-btns' }, h('p', { class: 'note', style: 'flex:1;margin:0' }, '보통 20초~1분 걸려요. 처음 한 번은 Claude 사용 허용 창이 떠요.'), h('button', { class: 'btn ghost sm', onclick: () => CL.ctl && CL.ctl.abort() }, '중지'))
+      : h('p', { class: 'note' }, '처음 한 번은 인식 엔진을 준비하느라 조금 더 걸려요. 그 다음부터는 바로 시작돼요.'))));
+
+  if (R.showText || R.raw || R.enText || R.koText) {
+    const useSplit = isLC && R.split;
+    const box = h('div', { class: 'panel' });
+    if (isLC) box.append(h('div', { class: 'toggle', style: 'margin:0 0 10px;justify-content:space-between' }, '칸 따로 붙여넣기 (영어 칸 / 한국어 칸)',
+      h('button', { class: 'switch', role: 'switch', 'aria-checked': String(R.split), 'aria-label': '칸 따로 붙여넣기', onclick: () => { R.split = !R.split; render(); } })));
+    if (useSplit) {
+      const en = h('textarea', { class: 'raw', id: 'enText', style: 'min-height:120px', placeholder: '왼쪽 영어 칸 텍스트\n\n예)\n1 reservation\n> make a reservation\nI want to make a reservation for two.', oninput: (e) => { R.enText = e.target.value; } });
+      const ko = h('textarea', { class: 'raw', id: 'koText', style: 'min-height:120px', placeholder: '오른쪽 한국어 칸 텍스트\n\n예)\n(명) 예약\n예약하다\n두 명 예약하고 싶어요.', oninput: (e) => { R.koText = e.target.value; } });
+      en.value = R.enText; ko.value = R.koText;
+      box.append(h('div', { class: 'form-l', style: 'margin-top:0' }, '영어 칸'), en, h('div', { class: 'form-l' }, '한국어 칸'), ko);
+    } else {
+      const ta = h('textarea', { class: 'raw', id: 'rawText', placeholder: isLC ? '여기에 표 형식 단어장 텍스트를 붙여넣으세요.\n\n예)\n1 reservation (명) 예약\n> make a reservation 예약하다\n...' : '여기에 단어장 텍스트나 Claude 답변(코드 블록)을 붙여넣으세요.\n\n예)\n1. allocate 할당하다, 배분하다\nThe manager allocated additional funds ...\n매니저는 추가 자금을 할당했다.', oninput: (e) => { R.raw = e.target.value; } });
+      ta.value = R.raw;
+      box.append(ta);
+    }
+    const hasText = useSplit ? (R.enText || R.koText) : R.raw;
+    box.append(h('div', { class: 'row-btns' },
+      h('button', { class: 'btn primary sm', onclick: analyzeText }, R.entries.length ? '다시 분석' : '분석하기'),
+      !hasText ? h('button', { class: 'btn ghost sm', onclick: () => { if (useSplit) { const rows = SAMPLE_LC.split('\n').map((l) => l.split(/\s{2,}/)); R.enText = rows.map((r) => r[0]).join('\n'); R.koText = rows.map((r) => r[1] || '').join('\n'); } else R.raw = isLC ? SAMPLE_LC : SAMPLE; render(); } }, '예시 넣어보기') : null,
+      hasText ? h('button', { class: 'btn ghost sm', onclick: () => { if (useSplit) { R.enText = R.koText = ''; } else R.raw = ''; render(); } }, '지우기') : null));
+    wrap.append(h('div', { class: 'section' },
+      h('h3', null, R.entries.length ? '인식 원문 (고친 뒤 다시 분석할 수 있어요)' : '텍스트'), box));
+  }
+
+  if (R.entries.length) wrap.append(renderEntries());
+  return [wrap, R.entries.length ? renderSaveBar() : null];
+}
+
+function setDay(n) {
+  S.reg.day = n;
+  try { if (S.user) localStorage.setItem('toeic-voca-day:' + S.user.id, String(n)); } catch (e) {}
+}
+// 페이지에 인쇄된 "LC 3일차" 같은 표시에서 일차 찾기
+function detectDay(text) {
+  const m = String(text || '').match(/(\d{1,2})\s*일\s*차/);
+  const n = m ? Number(m[1]) : 0;
+  return n >= 1 && n <= MAX_DAY ? n : 0;
+}
+function applyDetectedDay(entries, n, fillAll) {
+  if (!n) return;
+  if (fillAll !== false) entries.forEach((e) => { if (!e.day) e.day = n; });   // 한 페이지 인식: 모든 항목에 적용
+  if (S.reg.day !== n) { setDay(n); toast(`페이지에 적힌 ${n}일차로 맞췄어요`); }
+}
+function setSection(k, auto) {
+  const R = S.reg;
+  if (R.section === k) return;
+  R.section = k;
+  try { localStorage.setItem('toeic-voca-section', k); } catch (e) {}
+  R.entries.forEach((e) => (e.section = k));
+  if (auto) toast(`${SEC[k]} 단어장 페이지로 인식했어요`);
+}
+// L/C 표의 품사 표시 "(명)" 에서 앞 괄호가 빠진 경우 복구
+function fixEntry(e) {
+  if (e.kind === 'word' && VocabParser.latinCount(e.term) < 3) e.include = false;   // "UJ" 같은 그림 조각은 체크 해제
+  if (e.section === 'LC' && e.meaning) e.meaning = e.meaning.replace(/^(명|동|형|부|전|접|대)\)\s*/, '($1) ');
+  return e;
+}
+function majoritySection(list) {
+  const lc = list.filter((e) => e.section === 'LC').length, rc = list.filter((e) => e.section === 'RC').length;
+  return lc || rc ? (lc >= rc ? 'LC' : 'RC') : null;
+}
+function analyzeText() {
+  const R = S.reg;
+  let r;
+  if (R.section === 'LC' && R.split) r = VocabParser.parseColumns(R.enText, R.koText);
+  else if (VocabParser.looksLikeJSON(R.raw)) {
+    // Claude 앱에서 받은 결과(JSON)를 붙여넣은 경우: 그대로 정확히 가져옴
+    r = VocabParser.parseJSON(R.raw) || [];
+    R.entries = r.map((e) => fixEntry({ ...e, section: e.section || R.section }));   // 항목마다 L/C·R/C 그대로
+    const dd = R.entries.find((e) => e.day); if (dd) applyDetectedDay(R.entries, dd.day, false);
+    render();
+    toast(r.length ? `Claude 결과 ${r.length}개를 가져왔어요` : 'Claude 결과를 읽지 못했어요. 답변의 코드 블록 전체를 복사해 주세요.');
+    return;
+  } else {
+    const det = VocabParser.detectSection(R.raw);
+    if (det) setSection(det, det !== R.section);
+    r = VocabParser.parse(R.raw, { section: R.section });
+  }
+  R.entries = r.map((e) => fixEntry({ ...e, section: R.section }));
+  applyDetectedDay(R.entries, detectDay(R.raw));
+  render();
+  if (!r.length) toast('단어를 찾지 못했어요. 형식을 확인해 주세요.'); else toast(`${r.length}개를 찾았어요`);
+}
+function renderEntries() {
+  const R = S.reg;
+  const allOn = R.entries.every((e) => e.include);
+  const box = h('div', { class: 'panel', style: 'padding:4px 16px' });
+  R.entries.forEach((e, i) => {
+    const term = h('textarea', { class: 'fld term' + (e.kind === 'example' ? ' ex' : ''), rows: 1, placeholder: e.kind === 'word' ? '영어 단어' : '영어 예문', autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false', 'aria-label': '영어',
+      oninput: (ev) => { e.term = ev.target.value; autosize(ev.target); updateSaveBar(); } });
+    term.value = e.term;
+    const mean = h('textarea', { class: 'fld mean' + (e.meaning ? '' : ' missing'), rows: 1, placeholder: '뜻이 비어 있어요 — 입력하면 저장돼요', 'aria-label': '뜻',
+      oninput: (ev) => { e.meaning = ev.target.value; if (e.meaning.trim() && !e.include && e.term.trim()) { e.include = true; row.classList.remove('off'); } autosize(ev.target); updateSaveBar(); } });
+    mean.value = e.meaning;
+    const row = h('div', { class: 'entry' + (e.include ? '' : ' off') },
+      h('button', { class: 'chk', html: I.check, 'aria-label': '선택', onclick: () => { e.include = !e.include; row.classList.toggle('off', !e.include); updateSaveBar(); } }),
+      h('div', { class: 'fields' },
+        h('div', { class: 'echips' },
+          h('span', { class: 'daychip' + (e.day || R.day ? '' : ' none') }, e.day || R.day ? `${e.day || R.day}일차` : '일차 미선택'),
+          h('button', { class: 'badge sec-' + (e.section === 'LC' ? 'LC' : e.section === 'RC' ? 'RC' : R.section), onclick: () => { e.section = (e.section || R.section) === 'LC' ? 'RC' : 'LC'; render(); } }, SEC[e.section || R.section], ' ⇄'),
+          h('button', { class: 'badge ' + e.kind, onclick: () => { e.kind = e.kind === 'word' ? 'example' : 'word'; render(); } }, e.kind === 'word' ? '단어' : '예문', ' ⇄')),
+        term, mean),
+      h('button', { class: 'del', html: I.x, 'aria-label': '삭제', onclick: () => { R.entries.splice(i, 1); render(); } }));
+    box.append(row);
+    requestAnimationFrame(() => { autosize(term); autosize(mean); });
+  });
+  return h('div', { class: 'section' },
+    h('h3', null, h('span', null, `인식 결과 ${R.entries.length}개`),
+      h('span', { style: 'display:flex;gap:6px' },
+        h('button', { class: 'btn ghost sm', onclick: () => { R.entries.forEach((x) => (x.include = !allOn)); render(); } }, allOn ? '전체 해제' : '전체 선택'),
+        h('button', { class: 'btn ghost sm', onclick: () => { R.entries = []; R.raw = ''; R.showText = false; render(); } }, '비우기'))),
+    box,
+    h('button', { class: 'btn ghost sm', style: 'margin-top:10px', onclick: () => { R.entries.push({ term: '', meaning: '', kind: 'word', section: R.section, include: true }); render(); } }, h('span', { html: I.plus }), '직접 추가'),
+    h('p', { class: 'note' }, `L/C·R/C 배지와 단어/예문 배지를 누르면 바뀌어요. 일차는 위에서 고른 값으로 저장돼요. 뜻이 비어 있는 항목은 저장되지 않아요. 이미 있는 단어는 자동으로 건너뛰어요.`));
+}
+const selectedCount = () => S.reg.entries.filter((e) => e.include && e.term.trim() && e.meaning.trim()).length;
+const saveLabel = (n) => (S.reg.day || S.reg.entries.every((e) => !e.include || e.day) ? `${n}개 저장하기${S.reg.day ? ` · ${S.reg.day}일차` : ''}` : `일차를 고르면 ${n}개 저장할 수 있어요`);
+function renderSaveBar() {
+  const n = selectedCount();
+  return h('div', { class: 'savebar' }, h('button', { class: 'btn primary', id: 'saveBtn', disabled: n === 0, onclick: onSave }, saveLabel(n)));
+}
+function updateSaveBar() { const b = document.getElementById('saveBtn'); if (!b) return; const n = selectedCount(); b.textContent = saveLabel(n); b.disabled = n === 0; }
+
+async function saveEntries(entries) {
+  // 반환: { added, dayFilled, dup }
+  const byKey = new Map(S.items.map((i) => [keyOf(i.term, i.kind, i.section), i]));
+  const norm = (t) => t.toLowerCase().replace(/\s+/g, ' ').trim();
+  const fresh = [], touched = [];
+  let dup = 0, dayFilled = 0;
+  for (const e of entries) {
+    if (!e.include) continue;
+    const t = (e.term || '').trim(), m = (e.meaning || '').trim();
+    if (!t || !m) continue;
+    const sec = e.section || S.reg.section;
+    const day = dayOf(e) || S.reg.day || null;
+    let ex = byKey.get(keyOf(t, e.kind, sec));
+    // 같은 단어가 다른 L/C·R/C로 저장돼 있고 일차가 없으면 그 단어로 봄 (예전 단어는 R/C로 저장돼 있었음)
+    if (!ex && day) ex = S.items.find((i) => !dayOf(i) && i.kind === e.kind && norm(i.term) === norm(t));
+    if (ex) {
+      if (day && !dayOf(ex)) {
+        // 이미 있는 단어: 일차가 비어 있을 때만 채움 (학습 기록은 그대로)
+        ex.day = day;
+        if (secOf(ex) !== sec) ex.section = sec;
+        touched.push(ex); dayFilled++;
+      } else dup++;
+      continue;
+    }
+    const it = newItem({ ...e, section: sec, day, term: t, meaning: m });
+    byKey.set(keyOf(t, e.kind, sec), it); fresh.push(it);
+  }
+  S.items.push(...fresh);
+  await Store.putMany(fresh.concat(touched)).catch(() => showWarn('저장에 실패했어요. 백업을 내보내 두세요.'));
+  return { added: fresh.length, dayFilled, dup };
+}
+async function onSave() {
+  const R = S.reg;
+  if (!R.day && R.entries.some((e) => e.include && !e.day)) {
+    toast('몇 일차 단어인지 먼저 골라 주세요');
+    const dp = document.getElementById('dayPick'); if (dp) { dp.scrollIntoView({ block: 'start', behavior: 'smooth' }); dp.classList.add('need'); setTimeout(() => dp.classList.remove('need'), 1600); }
+    return;
+  }
+  const res = await saveEntries(R.entries);
+  R.entries = []; R.raw = ''; R.showText = false;
+  render();
+  const parts = [`${res.added}개 저장`];
+  if (res.dayFilled) parts.push(`기존 ${res.dayFilled}개에 일차 지정`);
+  if (res.dup) parts.push(`중복 ${res.dup}개 제외`);
+  toast(parts.join(' · '), { label: '암기하기', fn: () => go('study') });
+}
+
+/* ---------- 사진 → 자르기 → 인식 ---------- */
+async function onFiles(list, mode) {
+  const files = Array.from(list || []).filter((f) => f.type.startsWith('image/') || /\.(heic|heif|jpe?g|png)$/i.test(f.name));
+  if (!files.length) return;
+  S.reg.mode = mode === 'claude' && CL.sample ? 'claude' : 'device';
+  S.reg.queue.push(...files);
+  if (!S.reg.cur) await nextFile();
+}
+async function loadImage(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = new Image(); img.decoding = 'async'; img.src = url;
+    await img.decode();
+    return img;
+  } catch (e) { URL.revokeObjectURL(url); throw e; }
+}
+async function nextFile() {
+  const R = S.reg;
+  const f = R.queue.shift();
+  if (!f) { R.cur = null; render(); return; }
+  try {
+    const img = await loadImage(f);
+    R.cur = { img, rot: 0, crop: { x: 0.03, y: 0.03, w: 0.94, h: 0.94 }, idx: (R.done || 0) + 1, total: (R.done || 0) + 1 + R.queue.length };
+  } catch (e) { toast('사진을 열지 못했어요. 다른 사진으로 시도해 주세요.'); return nextFile(); }
+  render();
+}
+function rotatedSize(img, rot) { const w = img.naturalWidth, hgt = img.naturalHeight; return rot % 180 ? [hgt, w] : [w, hgt]; }
+function drawRotated(img, rot, scale) {
+  const [rw, rh] = rotatedSize(img, rot);
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(rw * scale)); c.height = Math.max(1, Math.round(rh * scale));
+  const x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);
+  x.translate(c.width / 2, c.height / 2); x.rotate(rot * Math.PI / 180);
+  x.drawImage(img, -img.naturalWidth * scale / 2, -img.naturalHeight * scale / 2, img.naturalWidth * scale, img.naturalHeight * scale);
+  return c;
+}
+function renderCrop() {
+  const R = S.reg, C = R.cur;
+  const [rw, rh] = rotatedSize(C.img, C.rot);
+  const pv = drawRotated(C.img, C.rot, Math.min(1, 1100 / Math.max(rw, rh)));
+  const wrapEl = h('div', { class: 'cropwrap' }, pv);
+  const box = h('div', { class: 'cropbox' });
+  wrapEl.append(box);
+  const handles = ['nw', 'ne', 'sw', 'se'].map((k) => { const d = h('div', { class: 'handle', 'data-k': k, 'aria-hidden': 'true' }); wrapEl.append(d); return d; });
+  const place = () => {
+    const c = C.crop;
+    Object.assign(box.style, { left: c.x * 100 + '%', top: c.y * 100 + '%', width: c.w * 100 + '%', height: c.h * 100 + '%' });
+    const pts = { nw: [c.x, c.y], ne: [c.x + c.w, c.y], sw: [c.x, c.y + c.h], se: [c.x + c.w, c.y + c.h] };
+    handles.forEach((d) => { const p = pts[d.dataset.k]; d.style.left = p[0] * 100 + '%'; d.style.top = p[1] * 100 + '%'; });
+  };
+  place();
+  let drag = null;
+  wrapEl.addEventListener('pointerdown', (e) => {
+    const r = wrapEl.getBoundingClientRect();
+    const k = e.target.dataset && e.target.dataset.k;
+    drag = { k: k || 'move', sx: e.clientX, sy: e.clientY, c: { ...C.crop }, r };
+    wrapEl.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  wrapEl.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const dx = (e.clientX - drag.sx) / drag.r.width, dy = (e.clientY - drag.sy) / drag.r.height, c0 = drag.c, m = 0.08;
+    let { x, y, w, h: hh } = c0;
+    const cl = (v, a, b) => Math.min(b, Math.max(a, v));
+    if (drag.k === 'move') { x = cl(c0.x + dx, 0, 1 - w); y = cl(c0.y + dy, 0, 1 - hh); }
+    else {
+      if (drag.k.includes('w')) { x = cl(c0.x + dx, 0, c0.x + c0.w - m); w = c0.x + c0.w - x; }
+      if (drag.k.includes('e')) { w = cl(c0.w + dx, m, 1 - c0.x); }
+      if (drag.k.includes('n')) { y = cl(c0.y + dy, 0, c0.y + c0.h - m); hh = c0.y + c0.h - y; }
+      if (drag.k.includes('s')) { hh = cl(c0.h + dy, m, 1 - c0.y); }
+    }
+    C.crop = { x, y, w, h: hh }; place();
+  });
+  const end = () => { drag = null; };
+  wrapEl.addEventListener('pointerup', end); wrapEl.addEventListener('pointercancel', end);
+
+  return h('div', { class: 'section' },
+    h('h3', null, `인식할 영역 맞추기 (${C.idx}/${C.total}장)`),
+    h('div', { class: 'panel' }, wrapEl,
+      h('div', { class: 'croptools' },
+        h('button', { class: 'btn ghost sm', onclick: () => { C.rot = (C.rot + 90) % 360; C.crop = { x: 0.03, y: 0.03, w: 0.94, h: 0.94 }; render(); } }, h('span', { html: I.rotate }), '회전'),
+        h('div', { class: 'toggle' }, '좌우 2단',
+          h('button', { class: 'switch', role: 'switch', 'aria-checked': String(R.twoCol), 'aria-label': '좌우 2단 페이지', onclick: (e) => { R.twoCol = !R.twoCol; e.currentTarget.setAttribute('aria-checked', String(R.twoCol)); } }))),
+      h('p', { class: 'note' }, CL.sample ? 'Claude로 인식하면 여러 줄 예문과 표의 좌우 칸까지 정확하게 짝지어요 (내 Claude 사용량을 써요). 노란 모서리로 단어 부분만 남기면 더 정확해요.' : '노란 모서리를 끌어 단어 박스 안쪽만 남기면 머리글·테두리 때문에 생기는 오류가 줄어요.'),
+      h('div', { class: 'row-btns' },
+        R.mode === 'claude' && CL.sample ? h('button', { class: 'btn primary', style: 'flex:1', onclick: runClaude }, h('span', { html: I.spark }), '통합 등록') : null,
+        h('button', { class: R.mode === 'claude' && CL.sample ? 'btn ghost' : 'btn primary', style: R.mode === 'claude' && CL.sample ? '' : 'flex:1', onclick: runOCR }, R.mode === 'claude' && CL.sample ? `기기에서 인식 (${SEC[R.section]})` : `${SEC[R.section]} 글자 인식 시작`),
+        h('button', { class: 'btn ghost', onclick: () => { R.done = (R.done || 0) + 1; nextFile(); } }, R.queue.length ? '건너뛰기' : '취소'))));
+}
+
+/* ---------- 이미지 전처리: 회전·자르기·확대 → 회색조 → 조명 평탄화 → 대비 ---------- */
+function preprocess(C, section) {
+  const [rw, rh] = rotatedSize(C.img, C.rot);
+  const cw = C.crop.w * rw, ch = C.crop.h * rh;
+  let s = Math.min(2.2, Math.max(0.35, 2300 / cw));
+  if (rw * rh * s * s > 15e6) s = Math.sqrt(15e6 / (rw * rh));
+  const full = drawRotated(C.img, C.rot, s);
+  const W = Math.round(cw * s), H = Math.round(ch * s);
+  const out = document.createElement('canvas'); out.width = W; out.height = H;
+  const ctx = out.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(full, Math.round(C.crop.x * rw * s), Math.round(C.crop.y * rh * s), W, H, 0, 0, W, H);
+  full.width = full.height = 0;
+
+  const id = ctx.getImageData(0, 0, W, H), d = id.data, N = W * H;
+  const g = new Uint8ClampedArray(N);
+  for (let i = 0, j = 0; i < N; i++, j += 4) g[i] = (d[j] * 0.299 + d[j + 1] * 0.587 + d[j + 2] * 0.114) | 0;
+
+  // 배경 밝기 추정 (작게 줄인 뒤 최대값 필터로 글자 제거)
+  const bw = Math.max(8, Math.round(W / 28)), bh = Math.max(8, Math.round(H / 28));
+  const sc = document.createElement('canvas'); sc.width = bw; sc.height = bh;
+  const sx = sc.getContext('2d', { willReadFrequently: true });
+  sx.imageSmoothingQuality = 'high'; sx.drawImage(out, 0, 0, bw, bh);
+  const sd = sx.getImageData(0, 0, bw, bh).data;
+  let bg = new Float32Array(bw * bh);
+  for (let i = 0; i < bw * bh; i++) bg[i] = sd[i * 4] * 0.299 + sd[i * 4 + 1] * 0.587 + sd[i * 4 + 2] * 0.114;
+  const filt = (src, fn) => { const o = new Float32Array(bw * bh); for (let y = 0; y < bh; y++) for (let x = 0; x < bw; x++) { let acc = fn === 'max' ? 0 : 0, n = 0; for (let yy = Math.max(0, y - 1); yy <= Math.min(bh - 1, y + 1); yy++) for (let xx = Math.max(0, x - 1); xx <= Math.min(bw - 1, x + 1); xx++) { const v = src[yy * bw + xx]; if (fn === 'max') acc = Math.max(acc, v); else { acc += v; n++; } } o[y * bw + x] = fn === 'max' ? acc : acc / n; } return o; };
+  bg = filt(filt(bg, 'max'), 'max'); bg = filt(filt(bg, 'avg'), 'avg');
+
+  // 조명 평탄화 + 히스토그램
+  const hist = new Uint32Array(256);
+  const fx = (bw - 1) / Math.max(1, W - 1), fy = (bh - 1) / Math.max(1, H - 1);
+  for (let y = 0; y < H; y++) {
+    const gy = y * fy, y0 = gy | 0, y1 = Math.min(bh - 1, y0 + 1), ty = gy - y0;
+    for (let x = 0; x < W; x++) {
+      const gx = x * fx, x0 = gx | 0, x1 = Math.min(bw - 1, x0 + 1), tx = gx - x0;
+      const b = (bg[y0 * bw + x0] * (1 - tx) + bg[y0 * bw + x1] * tx) * (1 - ty) + (bg[y1 * bw + x0] * (1 - tx) + bg[y1 * bw + x1] * tx) * ty;
+      const i = y * W + x;
+      const v = Math.min(255, (g[i] / Math.max(b, 1)) * 255);
+      g[i] = v; hist[g[i]]++;
+    }
+  }
+  // 대비 늘리기 (하위 1% ~ 상위 60% 지점 기준) + 감마
+  let lo = 0, hi = 255, acc = 0;
+  for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc >= N * 0.01) { lo = v; break; } }
+  acc = 0; for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc >= N * 0.4) { hi = v; break; } }
+  if (hi - lo < 40) { lo = Math.max(0, hi - 120); }
+  const lut = new Uint8ClampedArray(256);
+  for (let v = 0; v < 256; v++) { const t = Math.min(1, Math.max(0, (v - lo) / Math.max(1, hi - lo))); lut[v] = section === 'LC' ? 255 * Math.pow(Math.min(1, t / 0.72), 1.4) : 255 * Math.pow(t, 1.5); }  // L/C: 연한 회색 워터마크는 흰색으로
+  for (let i = 0, j = 0; i < N; i++, j += 4) { const v = lut[g[i]]; d[j] = d[j + 1] = d[j + 2] = v; d[j + 3] = 255; }
+  if (section === 'LC') maskPictures(d, W, H);   // L/C 표 페이지의 사진·그림·QR만 지움 (R/C는 형광 띠 위 글자 보호)
+  ctx.putImageData(id, 0, 0);
+  return out;
+}
+// 표의 긴 가로·세로 선을 지움 (선에 붙은 첫 글자가 사라지는 문제 방지)
+function removeRulings(d, W, H) {
+  const dark = (x, y) => d[(y * W + x) * 4] < 120;
+  const wipe = (x, y) => { const k = (y * W + x) * 4; d[k] = d[k + 1] = d[k + 2] = 255; };
+  const vmin = Math.round(H * 0.025), hmin = Math.round(W * 0.05);
+  for (let x = 0; x < W; x++) {
+    let run = 0;
+    for (let y = 0; y <= H; y++) {
+      if (y < H && dark(x, y)) { run++; continue; }
+      if (run >= vmin) for (let yy = y - run; yy < y; yy++) { wipe(x, yy); if (x > 0) wipe(x - 1, yy); if (x < W - 1) wipe(x + 1, yy); }
+      run = 0;
+    }
+  }
+  for (let y = 0; y < H; y++) {
+    let run = 0;
+    for (let x = 0; x <= W; x++) {
+      if (x < W && dark(x, y)) { run++; continue; }
+      if (run >= hmin) for (let xx = x - run; xx < x; xx++) { wipe(xx, y); if (y > 0) wipe(xx, y - 1); if (y < H - 1) wipe(xx, y + 1); }
+      run = 0;
+    }
+  }
+}
+// 사진·그림·QR코드처럼 중간 톤이 넓게 뭉친 영역을 찾아 흰색으로 지움 (글자 인식 방해 요소 제거)
+function maskPictures(d, W, H) {
+  const cs = Math.max(12, Math.round(Math.min(W, H) / 90));   // 칸 크기
+  const gw = Math.ceil(W / cs), gh = Math.ceil(H / cs);
+  const pic = new Uint8Array(gw * gh);
+  for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++) {
+    let mid = 0, dark = 0, n = 0;
+    const x1 = Math.min(W, (gx + 1) * cs), y1 = Math.min(H, (gy + 1) * cs);
+    for (let y = gy * cs; y < y1; y += 2) for (let x = gx * cs; x < x1; x += 2) {
+      const v = d[(y * W + x) * 4]; n++;
+      if (v < 70) dark++; else if (v < 215) mid++;
+    }
+    if (n && (mid / n > 0.28 || dark / n > 0.5)) pic[gy * gw + gx] = 1;
+  }
+  // 덩어리(연결 영역) 단위로 크기 판정
+  const seen = new Uint8Array(gw * gh), stack = [];
+  for (let i = 0; i < gw * gh; i++) {
+    if (!pic[i] || seen[i]) continue;
+    const cells = []; stack.push(i); seen[i] = 1;
+    let minx = gw, maxx = 0, miny = gh, maxy = 0;
+    while (stack.length) {
+      const c = stack.pop(); cells.push(c);
+      const cx = c % gw, cy = (c / gw) | 0;
+      minx = Math.min(minx, cx); maxx = Math.max(maxx, cx); miny = Math.min(miny, cy); maxy = Math.max(maxy, cy);
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const nx = cx + dx, ny = cy + dy; if (nx < 0 || ny < 0 || nx >= gw || ny >= gh) continue;
+        const j = ny * gw + nx; if (pic[j] && !seen[j]) { seen[j] = 1; stack.push(j); }
+      }
+    }
+    const bw = maxx - minx + 1, bh = maxy - miny + 1;
+    // 글자 줄은 가로로 길고 얇음 → 세로·가로 모두 큰 덩어리만 그림으로 판단
+    if (cells.length >= 14 && bw >= 4 && bh >= 4 && cells.length / (bw * bh) > 0.3) {
+      const X0 = minx * cs, Y0 = miny * cs, X1 = Math.min(W, (maxx + 1) * cs), Y1 = Math.min(H, (maxy + 1) * cs);   // 여백 없이 그림 칸만 (옆 칸 글자 보호)
+      for (let y = Y0; y < Y1; y++) for (let x = X0; x < X1; x++) { const k = (y * W + x) * 4; d[k] = d[k + 1] = d[k + 2] = 255; }
+    }
+  }
+}
+function cropCanvas(src, x, y, w, hgt, pad) {
+  const X = Math.max(0, Math.floor(x - pad)), Y = Math.max(0, Math.floor(y - pad));
+  const W = Math.min(src.width - X, Math.ceil(w + pad * 2)), H = Math.min(src.height - Y, Math.ceil(hgt + pad * 2));
+  const c = document.createElement('canvas'); c.width = Math.max(1, W); c.height = Math.max(1, H);
+  const x2 = c.getContext('2d'); x2.fillStyle = '#fff'; x2.fillRect(0, 0, c.width, c.height);
+  x2.drawImage(src, X, Y, W, H, 0, 0, W, H);
+  return c;
+}
+
+/* ---------- Claude로 인식 (내 Claude 계정 사용) ---------- */
+const CL = { sample: null, max: 3, ctl: null };
+async function initClaude() {
+  try {
+    if (!window.claude || !window.claude.use) return;
+    const s = await window.claude.use('sample');
+    if (!s) return;
+    const lim = await s.limits().catch(() => null);
+    if (lim && lim.images) { CL.sample = s; CL.max = Math.max(1, Math.min(4, lim.images.maxCount || 3)); render(); }
+  } catch (e) {}
+}
+function claudePrompt(section, parts) {
+  const pieces = parts > 1
+    ? ` 한 페이지를 위에서 아래로 ${parts}조각으로 나눈 것이고, 조각 경계는 조금씩 겹칩니다. 겹쳐서 두 번 보이는 항목은 한 번만 적으세요.`
+    : ' 사진이 여러 장이면 각 장을 차례대로 모두 옮기세요.';
+  return `첨부한 사진은 토익 단어장 페이지입니다.${pieces}
+페이지에 인쇄된 학습 내용을 빠짐없이, 인쇄된 그대로 옮겨서 JSON 배열 하나로만 답하세요. 다른 설명은 쓰지 마세요.
+
+[형식 구분 - sec]
+- "RC": 위쪽에 "R/C Vocab"이 있거나, "11. steadily 꾸준히"처럼 번호·단어·뜻이 한 줄에 있고 그 아래 영어 예문과 한국어 해석이 이어지는 형식
+- "LC": 왼쪽 칸에 영어(번호 단어, "> 숙어", 예문), 오른쪽 칸에 한국어(뜻, 해석)가 있는 표 형식. 같은 높이의 왼쪽 칸과 오른쪽 칸이 짝입니다.
+- 사진마다 형식을 따로 판단하세요. 사진이 여러 장이면 장마다 L/C·R/C가 다를 수 있어요.
+
+[항목 - type]
+- "word": 번호가 붙은 표제어. en은 번호 없이 단어만, ko는 뜻 전체 (품사 표시 "(명)", "형)" 등은 인쇄된 그대로)
+- "phrase": "> "로 시작하는 숙어·파생어. en은 ">" 없이, ko는 그 뜻
+- "example": 예문. 여러 줄에 걸친 영어 문장은 한 문장으로 합치고, ko도 해석 전체를 한 줄로 합치세요 (" / " 같은 구분 기호는 그대로). head에는 이 예문이 속한 표제어
+- "= PR" 같은 동의어 줄은 따로 만들지 말고 표제어 ko 끝에 " (= PR)"처럼 붙이세요.
+- 페이지에 "LC 1일차", "3일차"처럼 일차가 인쇄돼 있으면 그 페이지의 모든 항목에 "day": 1 처럼 숫자로 넣으세요. 일차가 안 보이면 day는 빼세요.
+- 제외: 페이지 제목·머리글, QR·영상 안내, 사진·그림 속 글자, 워터마크, 쪽 번호, 맨 아래 명언
+- 손글씨 표시는 무시하고 인쇄된 글자만 읽으세요.
+
+[예시]
+[{"sec":"RC","type":"word","en":"allocate","ko":"할당하다, 배분하다"},
+ {"sec":"RC","type":"example","en":"The manager allocated additional funds to the marketing department.","ko":"매니저는 마케팅 부서에 추가 자금을 할당했다.","head":"allocate"},
+ {"sec":"LC","type":"word","en":"reservation","ko":"(명) 예약","day":1},
+ {"sec":"LC","type":"phrase","en":"make a reservation","ko":"예약하다","day":1}]`;
+}
+// 사진을 위→아래 조각으로 나눔 (Claude에 보내는 사진은 작게 줄어들기 때문에, 조각마다 글자가 크게 보이도록)
+async function makeStrips(C) {
+  const [rw, rh] = rotatedSize(C.img, C.rot);
+  const cw = C.crop.w * rw, ch = C.crop.h * rh;
+  let s = Math.min(1, 3000 / cw);
+  if (rw * rh * s * s > 24e6) s = Math.sqrt(24e6 / (rw * rh));
+  const full = drawRotated(C.img, C.rot, s);
+  const W = Math.round(cw * s), H = Math.round(ch * s), X = Math.round(C.crop.x * rw * s), Y = Math.round(C.crop.y * rh * s);
+  const n = Math.max(1, Math.min(CL.max, Math.ceil(H / (W * 0.62))));
+  const ov = n > 1 ? Math.round(H * 0.05) : 0;
+  const step = (H - ov) / n;
+  const blobs = [];
+  for (let i = 0; i < n; i++) {
+    const y0 = Math.round(i * step), hh = Math.round(Math.min(H - y0, step + ov));
+    const c = document.createElement('canvas'); c.width = W; c.height = hh;
+    c.getContext('2d').drawImage(full, X, Y + y0, W, hh, 0, 0, W, hh);
+    blobs.push(await new Promise((res) => c.toBlob(res, 'image/jpeg', 0.9)));
+  }
+  full.width = full.height = 0;
+  return blobs;
+}
+const CLAUDE_ERR = {
+  not_granted: 'Claude 사용을 허용해야 쓸 수 있어요. 기기에서 인식을 이용해 주세요.',
+  sampling_disabled: '이 계정에서는 Claude 연동을 쓸 수 없어요.',
+  images_unavailable: '이 화면에서는 사진을 Claude에 보낼 수 없어요.',
+  rate_limited: 'Claude 사용량이 많아요. 잠시 뒤 다시 시도해 주세요.',
+  session_expired: 'Claude에 다시 로그인한 뒤 시도해 주세요.',
+  image_rejected: '이 사진은 보낼 수 없어요. 다른 사진으로 시도해 주세요.',
+  invalid_json: '결과를 읽지 못했어요. 한 번 더 시도해 주세요.',
+  refused: 'Claude가 이 사진을 처리하지 않았어요.',
+};
+async function runClaude() {
+  const R = S.reg, C = R.cur; if (!C || !CL.sample) return;
+  R.busy = true; R.claude = true; R.progress = 0.05; R.status = 'Claude에 보낼 사진 준비 중…'; render();
+  const setStatus = (t, p) => { R.status = t; if (p != null) R.progress = p; const st = document.querySelector('.status'); if (st) st.lastChild.textContent = t; const bar = document.querySelector('.prog i'); if (bar) bar.style.width = Math.round(R.progress * 100) + '%'; };
+  let timer = null;
+  try {
+    const blobs = await makeStrips(C);
+    const ctl = new AbortController(); CL.ctl = ctl;
+    const t0 = Date.now(); let got = 0;
+    timer = setInterval(() => { const sec = Math.round((Date.now() - t0) / 1000); setStatus(got ? `Claude가 정리하는 중… ${got}개 항목 (${sec}초)` : `Claude가 사진을 읽는 중… ${sec}초`, Math.min(0.95, 0.1 + sec / 90)); }, 1000);
+    const data = await CL.sample.json(claudePrompt(R.section, blobs.length), {
+      images: blobs, signal: ctl.signal, modelTier: 'default',
+      onText: ({ text }) => { got = (text.match(/"en"\s*:/g) || []).length; },
+    });
+    const found = VocabParser.parseJSON(JSON.stringify(data)) || [];
+    // 통합 등록: 항목마다 Claude가 판단한 L/C·R/C를 그대로 사용
+    const fixed = found.map((e) => fixEntry({ ...e, section: e.section || R.section }));
+    const dd = fixed.find((e) => e.day); if (dd) applyDetectedDay(fixed, dd.day, false);   // 일차 표시 없는 페이지 항목은 위에서 고른 일차를 따름
+    R.entries = R.entries.concat(fixed);
+    toast(found.length ? `Claude가 ${found.length}개를 읽었어요. 저장 전에 확인해 주세요.` : '읽은 항목이 없어요. 영역을 다시 맞춰 주세요.');
+    R.done = (R.done || 0) + 1;
+    R.busy = false; R.claude = false;
+    clearInterval(timer);
+    await nextFile();
+  } catch (e) {
+    clearInterval(timer);
+    R.busy = false; R.claude = false; render();
+    const code = e && e.code;
+    if (code === 'cancelled') return;
+    if (['not_granted', 'sampling_disabled', 'images_unavailable', 'not_declared', 'capability_disabled', 'capability_removed'].includes(code)) { CL.sample = null; render(); }
+    toast(CLAUDE_ERR[code] || 'Claude 연결에 문제가 생겼어요. 잠시 뒤 다시 시도해 주세요.');
+  }
+}
+async function copyPrompt() {
+  const text = claudePrompt(S.reg.section, 1);
+  try { await navigator.clipboard.writeText(text); toast('요청 문구를 복사했어요. Claude 앱에 사진과 함께 붙여넣어 보내세요.'); return; } catch (e) {}
+  openSheet((close) => {
+    const ta = h('textarea', { class: 'input', rows: 10, readonly: true }); ta.value = text;
+    setTimeout(() => { ta.focus(); ta.select(); }, 50);
+    return h('div', null, h('h2', null, '요청 문구', h('button', { class: 'iconbtn', html: I.x, 'aria-label': '닫기', onclick: close })),
+      h('p', { class: 'note', style: 'margin:0 0 10px' }, '아래 글을 길게 눌러 전체 선택 → 복사해 주세요.'), ta);
+  });
+}
+
+/* ---------- Tesseract (기기 안에서 실행) ---------- */
+const OCR = { mixed: null, eng: null, loading: null };
+const absURL = (p) => new URL(p, location.href).href;
+function ocrOptions(onLog) {
+  return { workerPath: absURL('worker.min.js'), workerBlobURL: false, corePath: absURL('./'), langPath: absURL('.'), gzip: true, logger: onLog, errorHandler: (e) => console.warn(e) };
+}
+let ocrLog = () => {};
+async function ensureOCR() {
+  if (typeof Tesseract === 'undefined') throw new Error('인식 엔진을 불러오지 못했어요. 인터넷에 연결된 상태에서 앱을 한 번 다시 열어 주세요.');
+  if (OCR.mixed && OCR.eng) return;
+  if (!OCR.loading) OCR.loading = (async () => {
+    OCR.mixed = await Tesseract.createWorker(['kor', 'eng'], 1, ocrOptions((m) => ocrLog('mixed', m)));
+    await OCR.mixed.setParameters({ tessedit_pageseg_mode: '4', preserve_interword_spaces: '1' });
+    OCR.eng = await Tesseract.createWorker('eng', 1, ocrOptions((m) => ocrLog('eng', m)));
+    await OCR.eng.setParameters({ tessedit_pageseg_mode: '7', preserve_interword_spaces: '0' });
+  })().catch((e) => { OCR.loading = null; OCR.mixed = OCR.eng = null; throw e; });
+  return OCR.loading;
+}
+const JUNK = /^[|¦!\[\]{}_=:;'"`.,\-~\\*•]+$/;   // "/" 는 해석 구분자라 남김
+const isHg = (c) => !!c && /[가-힣]/.test(c);
+function cleanWords(words) {
+  // 떨어져 읽힌 마침표·쉼표는 바로 앞 단어에 붙임
+  const ws0 = [];
+  for (const w of words) {
+    const t = (w.text || '').trim(), p = ws0[ws0.length - 1];
+    if (p && /^[.,;:!?]+$/.test(t) && w.bbox.x0 - p.bbox.x1 < (p.bbox.y1 - p.bbox.y0) * 0.6) { p.text = p.text + t; p.bbox = { ...p.bbox, x1: w.bbox.x1 }; continue; }
+    ws0.push({ ...w });
+  }
+  words = ws0;
+  const NUM = /^[\(\[]?\d{1,4}\s*[.,)\]]$/;   // 항목 번호는 손글씨 표시가 겹쳐 신뢰도가 낮아도 유지
+  let ws = words.filter((w, i) => w.text && w.text.trim() && !JUNK.test(w.text.trim()) && (w.confidence >= 25 || (i <= 1 && NUM.test(w.text.trim()))));
+  const hangulTotal = ws.reduce((a, w) => a + VocabParser.hangulCount(w.text), 0);
+  if (hangulTotal >= 4) {
+    // 한국어 줄에 섞인 신뢰도 낮은 영문 조각(회색 띠·얼룩) 제거. "AWB", "Express" 등은 신뢰도가 높아 유지
+    ws = ws.filter((w) => VocabParser.hasHangul(w.text) || !/[A-Za-z]/.test(w.text) || w.confidence >= 50);
+  }
+  if (ws.length > 1 && /^[lI1i|]$/.test(ws[0].text.trim()) && ws[0].confidence < 60) ws = ws.slice(1);
+  if (ws.length > 1 && /^[lI1i|]$/.test(ws[ws.length - 1].text.trim()) && ws[ws.length - 1].confidence < 60) ws = ws.slice(0, -1);
+  return ws;
+}
+// 글자 사이 간격으로 한글 띄어쓰기 복원 (자간이 넓은 단어장 글꼴 대응)
+function joinWords(ws, thr) {
+  thr = thr || 0.62;
+  if (!ws.length) return '';
+  const hs = ws.filter((w) => VocabParser.hasHangul(w.text)).map((w) => w.bbox.y1 - w.bbox.y0);
+  const arr = (hs.length ? hs : ws.map((w) => w.bbox.y1 - w.bbox.y0)).sort((a, b) => a - b);
+  const mh = Math.max(1, arr[arr.length >> 1]);
+  let out = ws[0].text;
+  for (let i = 1; i < ws.length; i++) {
+    const a = ws[i - 1], b = ws[i];
+    const gap = (b.bbox.x0 - a.bbox.x1) / mh;
+    const join = gap < thr && isHg(b.text[0]) && (isHg(a.text.slice(-1)) || /\d/.test(a.text.slice(-1)));
+    out += (join ? '' : ' ') + b.text;
+  }
+  return out;
+}
+async function refineEnglish(canvas, words, box) {
+  if (box) words = [{ bbox: box }];
+  const x0 = Math.min(...words.map((w) => w.bbox.x0)), y0 = Math.min(...words.map((w) => w.bbox.y0));
+  const x1 = Math.max(...words.map((w) => w.bbox.x1)), y1 = Math.max(...words.map((w) => w.bbox.y1));
+  const lineH = y1 - y0;
+  const c = cropCanvas(canvas, x0, y0, x1 - x0, lineH, Math.max(6, lineH * 0.35));
+  const { data } = await OCR.eng.recognize(c);
+  const t = (data.text || '').replace(/\s+/g, ' ').trim();
+  return { text: t, conf: data.confidence || 0 };
+}
+// 표 형식(왼쪽 영어 칸 · 오른쪽 한국어 칸)을 같은 높이끼리 한 줄로 합치고,
+// 글자 크기가 본문과 너무 다른 줄(제목·워터마크·그림 속 작은 글자)은 버림
+function mergeRows(rawLines) {
+  const good = rawLines.flatMap((l) => l.words || []).filter((w) => w.confidence > 60 && /[A-Za-z가-힣]{2,}/.test(w.text));
+  const hs = good.map((w) => w.bbox.y1 - w.bbox.y0).sort((a, b) => a - b);
+  const med = hs.length ? hs[hs.length >> 1] : 0;
+  const mid = (arr) => arr.slice().sort((a, b) => a - b)[arr.length >> 1];
+  // 엔진이 서로 다른 높이의 두 줄을 한 줄로 묶은 경우 높이별로 다시 나눔
+  const split = [];
+  for (const l of rawLines) {
+    const ws = (l.words || []).filter((w) => w.text && w.text.trim()).sort((a, b) => (a.bbox.y0 + a.bbox.y1) - (b.bbox.y0 + b.bbox.y1));
+    let cur = [];
+    for (const w of ws) {
+      const h = w.bbox.y1 - w.bbox.y0, yc = (w.bbox.y0 + w.bbox.y1) / 2;
+      if (cur.length) { const p = cur[cur.length - 1], pc = (p.bbox.y0 + p.bbox.y1) / 2; if (yc - pc > 0.6 * Math.max(h, p.bbox.y1 - p.bbox.y0)) { split.push({ words: cur }); cur = []; } }
+      cur.push(w);
+    }
+    if (cur.length) split.push({ words: cur.sort((a, b) => a.bbox.x0 - b.bbox.x0) });
+  }
+  rawLines = split;
+  let lines = rawLines.map((l) => {
+    const ws = (l.words || []).filter((w) => w.text && w.text.trim()).sort((a, b) => a.bbox.x0 - b.bbox.x0);
+    if (!ws.length) return null;
+    return { words: ws, h: mid(ws.map((w) => w.bbox.y1 - w.bbox.y0)), yc: mid(ws.map((w) => (w.bbox.y0 + w.bbox.y1) / 2)),
+      x0: Math.min(...ws.map((w) => w.bbox.x0)), x1: Math.max(...ws.map((w) => w.bbox.x1)) };
+  }).filter(Boolean);
+  if (med) lines = lines.filter((L) => L.h >= med * 0.6 && L.h <= med * 1.9);
+  lines.sort((a, b) => a.yc - b.yc);
+  const rows = [];
+  for (const L of lines) {
+    const r = rows.find((R) => Math.abs(R.yc - L.yc) < 0.8 * Math.max(R.h, L.h) && R.segs.every((S) => L.x1 < S.x0 + 4 || L.x0 > S.x1 - 4));
+    if (r) { r.words = r.words.concat(L.words).sort((a, b) => a.bbox.x0 - b.bbox.x0); r.segs.push(L); }
+    else rows.push({ words: L.words.slice(), yc: L.yc, h: L.h, segs: [L] });
+  }
+  return rows.map((R) => ({ words: R.words, bbox: { x0: Math.min(...R.words.map((w) => w.bbox.x0)), y0: Math.min(...R.words.map((w) => w.bbox.y0)), x1: Math.max(...R.words.map((w) => w.bbox.x1)), y1: Math.max(...R.words.map((w) => w.bbox.y1)) } }));
+}
+// 페이지 전체의 한글 글자 사이 간격 분포에서 '글자 간격'과 '띄어쓰기'의 경계를 찾음 (글꼴마다 다름)
+function spacingThreshold(rows) {
+  const gaps = [];
+  for (const R of rows) {
+    const ws = R.words.filter((w) => w.confidence >= 40);
+    const hs = ws.filter((w) => VocabParser.hasHangul(w.text)).map((w) => w.bbox.y1 - w.bbox.y0).sort((a, b) => a - b);
+    if (!hs.length) continue;
+    const mh = Math.max(1, hs[hs.length >> 1]);
+    for (let i = 1; i < ws.length; i++) {
+      if (isHg(ws[i - 1].text.slice(-1)) && isHg(ws[i].text[0])) gaps.push((ws[i].bbox.x0 - ws[i - 1].bbox.x1) / mh);
+    }
+  }
+  const g = gaps.filter((x) => x > -0.2 && x < 2);
+  if (g.length < 12) return 0.62;
+  // Otsu: 두 무리로 나누는 최적 경계
+  const B = 60, hist = new Array(B).fill(0), lo = -0.2, w = 2.2 / B;
+  g.forEach((x) => hist[Math.min(B - 1, Math.floor((x - lo) / w))]++);
+  let best = 0, thr = 0.62, tot = g.length, sumAll = hist.reduce((a, c, i) => a + c * i, 0), wB = 0, sB = 0;
+  for (let i = 0; i < B; i++) {
+    wB += hist[i]; if (!wB || wB === tot) continue;
+    sB += hist[i] * i;
+    const mB = sB / wB, mF = (sumAll - sB) / (tot - wB), v = wB * (tot - wB) * (mB - mF) ** 2;
+    if (v > best) { best = v; thr = lo + (i + 1) * w; }
+  }
+  window.__gapInfo = { n: g.length, thr };
+  return Math.min(0.66, Math.max(0.28, thr));
+}
+async function recognizeCanvas(canvas, onStep, section) {
+  // L/C 표: 칸을 가로질러 한 줄씩 읽는 '한 덩어리' 모드, R/C 문단: '한 단' 모드
+  await OCR.mixed.setParameters({ tessedit_pageseg_mode: window.__psm || (section === 'LC' ? '6' : '4'), preserve_interword_spaces: '1' });
+  const { data } = await OCR.mixed.recognize(canvas);
+  OCR.rawText = (OCR.rawText || '') + '\n' + (data.text || '');
+  const merged = mergeRows(data.lines || []);
+  const thr = spacingThreshold(merged);
+  const lines = merged.map((l) => {
+    const raw = (l.words || []).filter((w) => w.text && w.text.trim() && !JUNK.test(w.text.trim()));
+    const conf = raw.length ? raw.reduce((a, w) => a + w.confidence, 0) / raw.length : 0;
+    const shaky = raw.some((w) => /[A-Za-z]{2,}/.test(w.text) && w.confidence < 60);
+    // 멀리 떨어진 얼룩 때문에 줄 영역이 늘어나지 않도록, 가장 큰 단어 덩어리만으로 영역 계산
+    let groups = [], g = [];
+    raw.forEach((w, i) => {
+      const hh = Math.max(4, w.bbox.y1 - w.bbox.y0);
+      if (i && w.bbox.x0 - raw[i - 1].bbox.x1 > hh * 4) { groups.push(g); g = []; }
+      g.push(w);
+    });
+    if (g.length) groups.push(g);
+    const main = groups.sort((a, b) => b.reduce((s2, w) => s2 + w.text.length, 0) - a.reduce((s2, w) => s2 + w.text.length, 0))[0] || [];
+    const bbox = main.length ? { x0: Math.min(...main.map((w) => w.bbox.x0)), y0: Math.min(...main.map((w) => w.bbox.y0)), x1: Math.max(...main.map((w) => w.bbox.x1)), y1: Math.max(...main.map((w) => w.bbox.y1)) } : l.bbox;
+    // 표의 왼쪽 칸/오른쪽 칸 경계 = 단어 사이 가장 큰 빈칸
+    const hs2 = raw.map((w) => w.bbox.y1 - w.bbox.y0).sort((a, b) => a - b);
+    const mh = hs2.length ? hs2[hs2.length >> 1] : 0;
+    let splitX = null, best = 0;
+    for (let i = 1; i < raw.length; i++) { const gap = raw[i].bbox.x0 - raw[i - 1].bbox.x1; if (gap > best) { best = gap; splitX = raw[i].bbox.x0; } }
+    if (!(best > mh * 2.5)) splitX = null;
+    const maxConf = raw.reduce((a, w) => Math.max(a, w.confidence), 0);
+    const full = raw.length ? { x0: Math.min(...raw.map((w) => w.bbox.x0)), y0: Math.min(...raw.map((w) => w.bbox.y0)), x1: Math.max(...raw.map((w) => w.bbox.x1)), y1: Math.max(...raw.map((w) => w.bbox.y1)) } : l.bbox;
+    return { words: cleanWords(l.words || []), conf, shaky, bbox, splitX, full, junk: maxConf < 70 && conf < 55 };
+  }).filter((L) => !L.junk);   // 그림 선이 글자로 읽힌 조각 줄은 버림
+  // 오른쪽 칸 시작 위치(페이지 공통): 줄마다 찾은 경계 중 왼쪽에 가까운 값
+  const splits = lines.map((L) => L.splitX).filter((x) => x != null).sort((a, b) => a - b);
+  const colX = splits.length >= 3 ? splits[Math.floor(splits.length * 0.2)] : null;
+  const out = [];
+  let k = 0;
+  for (const L of lines) {
+    k++; onStep(k, lines.length);
+    if (!L.words.length) continue;
+    let text = joinWords(L.words, thr);
+    if (section === 'LC' && L.splitX != null) {
+      // 표 한 줄: 왼쪽 영어 칸과 오른쪽 한국어 칸을 따로 처리
+      try {
+        const leftW = L.words.filter((w) => w.bbox.x1 <= L.splitX), rightW = L.words.filter((w) => w.bbox.x0 >= L.splitX);
+        let left = joinWords(leftW, thr);
+        if (leftW.length && !VocabParser.hasHangul(left) && leftW.some((w) => /[A-Za-z]{2,}/.test(w.text) && w.confidence < 75)) {
+          const r = await refineEnglish(canvas, leftW);
+          if (r.text && !VocabParser.hasHangul(r.text) && VocabParser.latinCount(r.text) >= VocabParser.latinCount(left) * 0.8 && r.conf >= 60) left = r.text;
+        }
+        let right = joinWords(rightW, thr);
+        // 영어 뒤에 바로 이어 읽으면 첫 한글 단어를 놓치기 쉬워서, 오른쪽 칸만 잘라 다시 읽음
+        const pad = Math.max(6, (L.full.y1 - L.full.y0) * 0.35);
+        const leftEdge = leftW.length ? Math.max(...leftW.map((w) => w.bbox.x1)) + pad : 0;
+        const x0 = Math.max(leftEdge, Math.min(L.splitX, colX != null ? colX : L.splitX) - pad);   // 첫 글자를 놓친 줄도 칸 시작부터 읽음
+        const crop = cropCanvas(canvas, x0, L.full.y0, L.full.x1 - x0, L.full.y1 - L.full.y0, pad);
+        await OCR.mixed.setParameters({ tessedit_pageseg_mode: '7' });
+        const { data: d2 } = await OCR.mixed.recognize(crop);
+        const rw = cleanWords(d2.words || []);
+        const re = joinWords(rw, thr);
+        if (re && VocabParser.hangulCount(re) >= VocabParser.hangulCount(right)) right = re;
+        text = (left + '  ' + right).trim();
+      } catch (e) { console.warn(e); }
+      out.push(text);
+      continue;
+    }
+    const H = VocabParser.hangulCount(text), Lt = VocabParser.latinCount(text);
+    try {
+      if (H === 0 && Lt >= 3 && (L.shaky || L.conf < 85)) {
+        // 영어 줄을 읽은 결과가 불안할 때만 영어 전용 모델로 줄 전체를 다시 읽고, 더 확실한 쪽을 선택
+        const r = await refineEnglish(canvas, L.words, L.bbox);
+        const rl = VocabParser.latinCount(r.text);
+        if (r.text && VocabParser.hangulCount(r.text) === 0 && rl >= Lt * 0.8 && rl <= Lt * 1.5 + 4 && r.conf >= Math.min(L.conf, 90) - 8) text = r.text;
+      } else if (H > 0) {
+        // 줄 앞쪽 영어(표제어)가 불안하게 읽혔으면 그 부분만 영어 모델로 다시 읽기
+        const lead = [];
+        for (const w of L.words) { if (VocabParser.hasHangul(w.text)) break; lead.push(w); }
+        const leadText = lead.map((w) => w.text).join(' ');
+        const weak = lead.some((w) => /[A-Za-z]/.test(w.text) && w.confidence < 80);
+        if (weak && lead.length && lead.length < L.words.length && VocabParser.latinCount(leadText) >= 2) {
+          const r = await refineEnglish(canvas, lead);
+          if (r.text && VocabParser.hangulCount(r.text) === 0 && VocabParser.latinCount(r.text) >= 2 && r.conf >= 60) {
+            text = r.text + ' ' + joinWords(L.words.slice(lead.length), thr);
+          }
+        }
+      }
+    } catch (e) { console.warn(e); }
+    out.push(text);
+  }
+  return out;
+}
+async function runOCR() {
+  const R = S.reg, C = R.cur; if (!C) return;
+  R.busy = true; R.progress = 0.02; R.status = '사진 다듬는 중…'; render();
+  const setP = (p, s) => { R.progress = p; if (s) R.status = s; const bar = document.querySelector('.prog i'); const st = document.querySelector('.status'); if (bar) bar.style.width = Math.round(p * 100) + '%'; if (st && s) st.lastChild.textContent = s; };
+  try {
+    await new Promise((r) => setTimeout(r, 30));
+    let canvas = preprocess(C, R.section);
+    let curPart = 0;
+    const splitParts = (cv) => R.twoCol ? [cropCanvas(cv, 0, 0, cv.width / 2, cv.height, 0), cropCanvas(cv, cv.width / 2, 0, cv.width / 2, cv.height, 0)] : [cv];
+    let parts = splitParts(canvas);
+    ocrLog = (who, m) => {
+      if (m.status && /loading|initializ/i.test(m.status) && !OCR.mixed) setP(0.05 + 0.15 * (m.progress || 0), '인식 엔진 준비 중… (처음 한 번)');
+      else if (who === 'mixed' && m.status === 'recognizing text') setP(0.2 + 0.45 * ((curPart + (m.progress || 0)) / parts.length), '글자 읽는 중…');
+    };
+    setP(0.05, '인식 엔진 준비 중…');
+    await ensureOCR();
+    const readAll = async (mode) => {
+      let lines = [];
+      for (curPart = 0; curPart < parts.length; curPart++) {
+        const ls = await recognizeCanvas(parts[curPart], (k, n) => setP(0.65 + 0.33 * ((curPart + k / n) / parts.length), `영어 부분 정밀하게 다시 읽는 중… ${k}/${n}`), mode);
+        lines = lines.concat(ls);
+      }
+      return lines.join('\n');
+    };
+    const mode = R.section;
+    OCR.rawText = '';
+    let text = await readAll(mode);
+    const det = VocabParser.detectSection(OCR.rawText + '\n' + text);
+    if (det && det !== mode) {
+      setSection(det, true);
+      // 다른 형식으로 판별되면 그 형식에 맞는 방식으로 한 번 더 읽음
+      setP(0.2, `${SEC[det]} 형식으로 다시 읽는 중…`);
+      canvas = preprocess(C, det); parts = splitParts(canvas);
+      text = await readAll(det);
+    }
+    const found = VocabParser.parse(text, { section: R.section, fromOCR: true }).map((e) => fixEntry({ ...e, section: R.section }));
+    applyDetectedDay(found, detectDay(OCR.rawText + '\n' + text));
+    R.raw = (R.raw ? R.raw.trim() + '\n' : '') + text;
+    R.entries = R.entries.concat(found);
+    R.busy = false; R.done = (R.done || 0) + 1;
+    toast(found.length ? `${found.length}개를 찾았어요. 저장 전에 확인해 주세요.` : '단어를 찾지 못했어요. 영역을 좁히거나 밝은 곳에서 다시 찍어 주세요.');
+    await nextFile();
+  } catch (e) {
+    console.error(e);
+    R.busy = false; render();
+    toast(String(e && e.message || e).slice(0, 90) || '인식 중 문제가 생겼어요');
+  }
+}
+
+/* ================= 단어장 화면 ================= */
+function listRows() {
+  const L = S.list, q = L.q.trim().toLowerCase();
+  // 같은 묶음 안에서는 '또는', 묶음끼리는 '그리고' (아무것도 안 고르면 전체)
+  return S.items.filter((i) => {
+    if (L.days.length && !L.days.includes(dayOf(i))) return false;     // 1. 일차
+    if (L.secs.length && !L.secs.includes(secOf(i))) return false;     // 2. L/C·R/C
+    if (L.kinds.length && !L.kinds.includes(i.kind)) return false;     // 3. 단어/예문
+    if (L.weak) { const a = accOf(i); if (a == null || a >= 0.6) return false; }   // 4. 취약
+    return !q || i.term.toLowerCase().includes(q) || i.meaning.toLowerCase().includes(q);
+  }).sort((a, b) => L.weak ? accOf(a) - accOf(b) : (dayOf(a) || 99) - (dayOf(b) || 99) || b.createdAt - a.createdAt);
+}
+function openListDays() {
+  const L = S.list;
+  openSheet((close) => {
+    const body = h('div');
+    const paint = () => {
+      body.innerHTML = '';
+      const counts = new Map(dayGroups(S.items).map((g) => [g.key, g]));
+      const btn = (n) => { const g = counts.get(n), on = L.days.includes(n);
+        return h('button', { class: 'dcell' + (on ? ' on' : ''), disabled: !g && !on, onclick: () => { L.days = on ? L.days.filter((k) => k !== n) : L.days.concat(n); paint(); } },
+          h('b', null, n ? `${n}일차` : '미지정'), h('small', null, g ? `${g.count}개` : '0')); };
+      body.append(h('div', { class: 'dgrid' }, DAYS.map(btn), counts.has(0) ? btn(0) : null),
+        h('div', { class: 'row-btns', style: 'margin-top:14px' },
+          h('button', { class: 'btn ghost sm', onclick: () => { L.days = []; paint(); } }, '전체 일차'),
+          h('button', { class: 'btn primary sm', style: 'flex:1', onclick: () => { L.limit = 80; close(); render(); } }, '적용')));
+    };
+    paint();
+    return h('div', null, h('h2', null, '일차 선택 (여러 개 가능)', h('button', { class: 'iconbtn', html: I.x, 'aria-label': '닫기', onclick: () => { close(); render(); } })), body);
+  });
+}
+function renderList() {
+  const L = S.list, items = S.items;
+  const studied = items.filter((i) => i.attempts > 0);
+  const ta = studied.reduce((a, i) => a + i.attempts, 0), tc = studied.reduce((a, i) => a + i.correct, 0);
+  const lc = items.filter((i) => secOf(i) === 'LC').length;
+  const q = L.q.trim().toLowerCase();
+  const rows = listRows();
+
+  const wrap = h('div', { class: 'scroll' });
+  wrap.append(h('div', { class: 'topbar' }, h('h1', { class: 'h1' }, '단어장', h('small', { class: 'who' }, S.user ? `${S.user.name}님` : '')), h('button', { class: 'iconbtn', html: I.more, 'aria-label': '메뉴', onclick: openMenu })));
+  wrap.append(h('div', { class: 'stats' },
+    h('div', { class: 'stat' }, h('b', null, items.length), h('span', null, '전체')),
+    h('div', { class: 'stat' }, h('b', null, `${lc}·${items.length - lc}`), h('span', null, 'L/C·R/C')),
+    h('div', { class: 'stat' }, h('b', null, studied.length), h('span', null, '학습함')),
+    h('div', { class: 'stat' }, h('b', null, ta ? pct(tc / ta) : '—'), h('span', null, '정답률'))));
+  const search = h('input', { class: 'search', type: 'search', id: 'listSearch', placeholder: '단어 또는 뜻 검색', value: L.q, oninput: (e) => { L.q = e.target.value; L.limit = 80; refreshList(); } });
+  const toggle = (k, v) => { L[k] = L[k].includes(v) ? L[k].filter((x) => x !== v) : L[k].concat(v); L.limit = 80; render(); };
+  const chip = (k, v, lab) => h('button', { class: 'chip', 'aria-pressed': String(L[k].includes(v)), onclick: () => toggle(k, v) }, lab);
+  const dayText = !L.days.length ? '일차 전체' : L.days.length <= 3 ? L.days.slice().sort((a, b) => (a || 99) - (b || 99)).map((n) => (n ? `${n}` : '미지정')).join('·') + (L.days.every((n) => n) ? '일차' : '') : `일차 ${L.days.length}개`;
+  const anyFilter = L.days.length || L.secs.length || L.kinds.length || L.weak;
+  wrap.append(h('div', { class: 'section filters' },
+    search,
+    h('div', { class: 'chips fchips' },
+      h('span', { class: 'fgroup' }, h('button', { class: 'chip daychip-btn', 'aria-pressed': String(L.days.length > 0), onclick: openListDays }, dayText, ' ▾')),
+      h('span', { class: 'fgroup' }, chip('secs', 'LC', 'L/C'), chip('secs', 'RC', 'R/C')),
+      h('span', { class: 'fgroup' }, chip('kinds', 'word', '단어'), chip('kinds', 'example', '예문')),
+      h('span', { class: 'fgroup' }, h('button', { class: 'chip', 'aria-pressed': String(L.weak), onclick: () => { L.weak = !L.weak; L.limit = 80; render(); } }, '취약 60%↓'))),
+    anyFilter ? h('div', { class: 'fsum' }, h('span', null, `${rows.length}개 표시`), h('button', { class: 'alink', style: 'padding:0', onclick: () => { Object.assign(L, { days: [], secs: [], kinds: [], weak: false, limit: 80 }); render(); } }, '필터 모두 해제')) : null));
+  const listEl = h('div', { class: 'list', id: 'listBox' });
+  fillList(listEl, rows);
+  wrap.append(listEl);
+  if (!rows.length) wrap.append(h('p', { class: 'note', style: 'text-align:center;margin-top:16px' }, items.length ? '조건에 맞는 항목이 없어요.' : '등록된 단어가 없어요. 등록 탭에서 추가해 주세요.'));
+  return wrap;
+}
+function fillList(listEl, rows) {
+  listEl.innerHTML = '';
+  listEl.hidden = !rows.length;
+  rows.slice(0, S.list.limit).forEach((i) => {
+    const a = accOf(i);
+    listEl.append(h('button', { class: 'li', onclick: () => openEdit(i) },
+      h('span', { class: 'bar ' + i.kind }),
+      h('span', { style: 'min-width:0' }, h('div', { class: 'tag sec-' + secOf(i) }, h('span', { class: 'tagdate' }, dayLabel(dayOf(i)) + ' · '), SEC[secOf(i)]), h('div', { class: 't' + (i.kind === 'example' ? ' ex' : '') }, i.term), h('div', { class: 'm' }, i.meaning)),
+      h('span', { class: 'r', style: a != null ? `color:${a >= .8 ? 'var(--ok)' : a >= .5 ? 'var(--ex)' : 'var(--no)'}` : '' }, a != null ? pct(a) : '', h('small', null, i.attempts ? `${i.attempts}회` : '미학습'))));
+  });
+  if (rows.length > S.list.limit) listEl.append(h('button', { class: 'more', onclick: () => { S.list.limit += 200; refreshList(); } }, `더 보기 (${rows.length - S.list.limit}개 남음)`));
+}
+function refreshList() {
+  const L = S.list, q = L.q.trim().toLowerCase();
+  const rows = listRows();
+  const box = document.getElementById('listBox'); if (box) fillList(box, rows);
+}
+
+/* ---------- 시트 ---------- */
+function openSheet(content) {
+  document.querySelectorAll('.toast').forEach((t) => t.remove());   // 창 위에 알림이 겹치지 않게
+  const close = () => { $layer.innerHTML = ''; };
+  const bd = h('div', { class: 'backdrop', onclick: (e) => { if (e.target === bd) close(); } }, h('div', { class: 'sheet', role: 'dialog', 'aria-modal': 'true' }, h('div', { class: 'grab' }), content(close)));
+  $layer.innerHTML = ''; $layer.append(bd);
+}
+function openEdit(item) {
+  openSheet((close) => {
+    const d = { term: item.term, meaning: item.meaning, kind: item.kind, section: secOf(item), day: dayOf(item) };
+    let confirmDel = false;
+    const segBtns = [];
+    const seg = h('div', { class: 'seg' }, ['word', 'example'].map((k) => { const b = h('button', { 'aria-pressed': String(d.kind === k), onclick: () => { d.kind = k; segBtns.forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.k === k))); } }, k === 'word' ? '단어' : '예문'); b.dataset.k = k; segBtns.push(b); return b; }));
+    const secBtns = [];
+    const secSeg = h('div', { class: 'seg' }, ['LC', 'RC'].map((k) => { const b = h('button', { 'aria-pressed': String(d.section === k), onclick: () => { d.section = k; secBtns.forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.k === k))); } }, SEC[k]); b.dataset.k = k; secBtns.push(b); return b; }));
+    const daySel = h('select', { class: 'input', id: 'editDay', onchange: (e) => (d.day = Number(e.target.value)) },
+      h('option', { value: '0', selected: !d.day }, '일차 미지정'), DAYS.map((n) => h('option', { value: String(n), selected: d.day === n }, `${n}일차`)));
+    const t = h('textarea', { class: 'input en', id: 'editTerm', rows: 2, autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false', oninput: (e) => (d.term = e.target.value) }); t.value = d.term;
+    const m = h('textarea', { class: 'input', id: 'editMeaning', rows: 3, oninput: (e) => (d.meaning = e.target.value) }); m.value = d.meaning;
+    const delBtn = h('button', { class: 'btn ghost', style: 'color:var(--no)', onclick: async () => {
+      if (!confirmDel) { confirmDel = true; delBtn.textContent = '한 번 더 누르면 삭제'; delBtn.className = 'btn danger'; delBtn.style.color = '#fff'; return; }
+      S.items = S.items.filter((x) => x !== item); if (S.current === item) S.current = null;
+      await Store.del([item.id]); close(); render(); toast('삭제했어요');
+    } }, '삭제');
+    return h('div', null,
+      h('h2', null, '항목 편집', h('button', { class: 'iconbtn', html: I.x, 'aria-label': '닫기', onclick: close })),
+      h('div', { class: 'form-l', style: 'margin-top:0' }, '일차'), daySel,
+      h('div', { class: 'form-l' }, '단어장'), secSeg,
+      h('div', { class: 'form-l' }, '구분'), seg,
+      h('div', { class: 'form-l' }, '영어'), t,
+      h('div', { class: 'form-l' }, '뜻'), m,
+      h('div', { class: 'form-l' }, '학습 기록'),
+      h('div', { class: 'kv' },
+        h('div', null, h('b', null, item.attempts), h('span', null, '푼 횟수')),
+        h('div', null, h('b', null, accOf(item) != null ? pct(accOf(item)) : '—'), h('span', null, '정답률')),
+        h('div', null, h('b', null, item.weight >= 0.01 ? item.weight.toFixed(2) : item.weight.toExponential(0)), h('span', null, '출제 비중'))),
+      h('div', { class: 'row-btns', style: 'margin-top:16px' },
+        h('button', { class: 'btn primary', style: 'flex:1', onclick: async () => {
+          if (!d.term.trim() || !d.meaning.trim()) { toast('영어와 뜻을 모두 입력해 주세요'); return; }
+          Object.assign(item, { term: d.term.trim(), meaning: d.meaning.trim(), kind: d.kind, section: d.section, day: d.day || null });
+          await Store.put(item); close(); render(); toast('저장했어요');
+        } }, '저장'),
+        h('button', { class: 'btn ghost', onclick: async () => { Object.assign(item, { weight: 1, attempts: 0, correct: 0, lastSeen: 0 }); await Store.put(item); close(); render(); toast('이 항목의 기록을 초기화했어요'); } }, '기록 초기화'),
+        delBtn));
+  });
+}
+function openMenu() {
+  openSheet((close) => {
+    let armReset = false, armDel = false;
+    const resetBtn = h('button', { onclick: async () => {
+      if (!armReset) { armReset = true; resetBtn.lastChild.firstChild.textContent = '한 번 더 누르면 초기화'; return; }
+      S.items.forEach((i) => Object.assign(i, { weight: 1, attempts: 0, correct: 0, lastSeen: 0 }));
+      await Store.putMany(S.items); close(); render(); toast('모든 학습 기록을 초기화했어요');
+    } }, h('span', { html: I.reset }), h('span', null, '학습 기록 초기화', h('small', null, '단어는 그대로, 정답률과 출제 비중만 처음으로')));
+    const delBtn = h('button', { class: 'warn', onclick: async () => {
+      if (!armDel) { armDel = true; delBtn.lastChild.firstChild.textContent = `한 번 더 누르면 ${S.items.length}개 모두 삭제`; return; }
+      const ids = S.items.map((i) => i.id); S.items = []; S.current = null;
+      await Store.del(ids); close(); render(); toast('모두 삭제했어요');
+    } }, h('span', { html: I.trash }), h('span', null, '전체 삭제', h('small', null, '되돌릴 수 없어요. 먼저 백업을 권해요')));
+    const importInput = h('input', { type: 'file', accept: '.json,application/json,text/plain', hidden: true, onchange: (e) => { importBackup(e.target.files[0]); close(); } });
+    return h('div', null,
+      h('h2', null, '단어장 관리', h('button', { class: 'iconbtn', html: I.x, 'aria-label': '닫기', onclick: close })),
+      h('div', { class: 'menu' },
+        h('button', { onclick: () => { exportBackup(); } }, h('span', { html: I.down }), h('span', null, '백업 파일 내보내기', h('small', null, '단어와 학습 기록 전체를 파일 하나로 저장'))),
+        h('button', { onclick: () => importInput.click() }, h('span', { html: I.up }), h('span', null, '백업 불러오기', h('small', null, '내보낸 파일을 선택하면 합쳐서 불러와요'))),
+        resetBtn, delBtn,
+        S.user && !S.user.admin ? h('button', { onclick: () => { close(); openAdminKey(); } }, h('span', { html: I.spark }), h('span', null, '관리자 키 등록', h('small', null, '관리자만 해당돼요'))) : null,
+        h('button', { onclick: () => { close(); logout(); } }, h('span', { html: I.up }), h('span', null, '로그아웃', h('small', null, `${S.user ? S.user.name + ' (' + S.user.id + ')' : ''} · 다시 들어올 때 비밀번호가 필요해요`)))),
+      importInput,
+      h('p', { class: 'note' }, `저장 위치: ${Store.mode === 'idb' ? '이 기기의 브라우저 저장소' : Store.mode === 'local' ? '이 기기의 브라우저 저장소(간이)' : '저장 안 됨 (화면을 닫으면 사라져요)'} · ${S.items.length}개`));
+  });
+}
+function backupJSON() {
+  return JSON.stringify({ app: 'toeic-voca', version: 3, account: S.user ? { id: S.user.id, name: S.user.name, salt: S.user.salt, hash: S.user.hash, admin: !!S.user.admin, apv: S.user.apv, apvCode: S.user.apvCode, apvSig: S.user.apvSig, createdAt: S.user.createdAt } : null, exportedAt: new Date().toISOString(), items: S.items }, null, 1);
+}
+async function exportBackup() {
+  if (!S.items.length) { toast('내보낼 단어가 없어요'); return; }
+  const name = `토익단어-백업-${new Date().toISOString().slice(0, 10)}.json`;
+  let dl = null;
+  try { dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { dl = null; }
+  if (dl) {
+    try { await dl.save({ filename: name, data: backupJSON() }); toast('백업 파일을 저장했어요'); return; }
+    catch (e) { if (e && e.code === 'declined') return; }
+  }
+  try {
+    const file = new File([backupJSON()], name, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); toast('공유 시트에서 "파일에 저장"을 고르면 보관돼요'); return; }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; document.body.append(a); a.click(); a.remove();
+    toast('백업 파일을 만들었어요'); return;
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  // 대체: 텍스트로 복사
+  openSheet((close) => {
+    const ta = h('textarea', { class: 'input', rows: 8, readonly: true }); ta.value = backupJSON();
+    return h('div', null, h('h2', null, '백업 복사하기', h('button', { class: 'iconbtn', html: I.x, 'aria-label': '닫기', onclick: close })),
+      h('p', { class: 'note', style: 'margin:0 0 10px' }, '이 화면에서는 파일 저장이 안 돼요. 아래 내용을 복사해 메모 앱에 붙여 두면, 나중에 .json 파일로 저장해 불러올 수 있어요.'),
+      ta, h('div', { class: 'row-btns' }, h('button', { class: 'btn primary', onclick: async () => { try { await navigator.clipboard.writeText(ta.value); toast('복사했어요'); } catch (e) { ta.select(); toast('길게 눌러 복사해 주세요'); } } }, '복사')));
+  });
+}
+async function importBackup(file) {
+  if (!file) return;
+  let list;
+  try {
+    const obj = JSON.parse(await file.text());
+    list = (Array.isArray(obj) ? obj : obj.items) || null;
+    if (!Array.isArray(list)) throw new Error('형식');
+    list = list.filter((r) => r && r.term && r.meaning);
+  } catch (e) { toast('백업 파일을 읽지 못했어요. 내보낸 .json 파일인지 확인해 주세요.'); return; }
+  if (!list.length) { toast('백업 파일에 단어가 없어요'); return; }
+  const studied = list.filter((r) => (r.attempts | 0) > 0).length;
+  const dated = list.filter((r) => dayOf(r)).length;
+  // 학습 기록을 같이 가져올지 선택
+  openSheet((close) => {
+    let withStats = studied > 0;
+    const opt = (val, title, desc) => h('button', { class: 'drow' + (withStats === val ? ' on' : ''), style: 'grid-template-columns:24px minmax(0,1fr)', onclick: (e) => { withStats = val; e.currentTarget.parentElement.querySelectorAll('.drow').forEach((b, i) => b.classList.toggle('on', (i === 0) === val)); } },
+      h('span', { class: 'dchk', html: I.check }), h('span', null, h('span', { class: 'dname' }, title), h('small', { style: 'display:block;color:var(--muted);font-size:12px;margin-top:2px' }, desc)));
+    return h('div', null,
+      h('h2', null, '백업 불러오기', h('button', { class: 'iconbtn', html: I.x, 'aria-label': '닫기', onclick: close })),
+      h('p', { class: 'note', style: 'margin:0 0 12px' }, `단어 ${list.length}개 · 학습 기록 있는 단어 ${studied}개 · 일차 지정 ${dated}개`),
+      h('div', { class: 'dlist', style: 'max-height:none' },
+        opt(true, '학습 기록도 가져오기', '정답률·푼 횟수·출제 비중까지 그대로 가져와요. 이미 있는 단어는 더 많이 푼 기록으로 맞춰요.'),
+        opt(false, '단어만 가져오기', '단어·뜻·일차만 가져오고 학습 기록은 처음부터 시작해요. 이미 있는 단어의 기록은 바꾸지 않아요.')),
+      h('div', { class: 'row-btns', style: 'margin-top:14px' },
+        h('button', { class: 'btn primary', style: 'flex:1', onclick: async () => { close(); await doImport(list, withStats); } }, '불러오기'),
+        h('button', { class: 'btn ghost', onclick: close }, '취소')));
+  });
+}
+async function doImport(list, withStats) {
+  const byKey = new Map(S.items.map((i) => [keyOf(i.term, i.kind, i.section), i]));
+  const changed = new Set(); let added = 0, merged = 0, dayed = 0;
+  for (const r of list) {
+    const kind = r.kind === 'example' ? 'example' : 'word';
+    const section = r.section === 'LC' ? 'LC' : 'RC';
+    const k = keyOf(r.term, kind, section), ex = byKey.get(k);
+    const rday = dayOf(r);
+    if (ex) {
+      if (rday && dayOf(ex) !== rday) { ex.day = rday; changed.add(ex); dayed++; }
+      if (withStats && (r.attempts || 0) > ex.attempts) { Object.assign(ex, { weight: Math.min(W_MAX, Math.max(W_MIN, +r.weight || 1)), attempts: r.attempts | 0, correct: r.correct | 0, lastSeen: r.lastSeen || 0 }); changed.add(ex); merged++; }
+      continue;
+    }
+    const it = { ...newItem({ term: String(r.term), meaning: String(r.meaning), kind, section, day: rday, ref: r.ref || '' }), createdAt: r.createdAt || Date.now() };
+    if (withStats) Object.assign(it, { weight: Math.min(W_MAX, Math.max(W_MIN, +r.weight || 1)), attempts: r.attempts | 0, correct: r.correct | 0, lastSeen: r.lastSeen || 0 });
+    S.items.push(it); byKey.set(k, it); changed.add(it); added++;
+  }
+  await Store.putMany([...changed]); S.current = null; render();
+  const parts = [`${added}개 추가`];
+  if (merged) parts.push(`${merged}개 학습 기록 갱신`);
+  if (dayed) parts.push(`${dayed}개 일차 반영`);
+  toast(parts.join(' · ') + (withStats ? '' : ' (학습 기록 제외)'));
+}
+
+/* ================= 라우팅 ================= */
+function go(tab) { S.tab = tab; $layer.innerHTML = ''; render(true); $screen.scrollTop = 0; }
+function render(animate) {
+  const tabs = document.querySelector('.tabs');
+  if (!S.user || S.authOverlay) {
+    tabs.hidden = true;
+    $screen.innerHTML = '';
+    $screen.append(renderAuth());
+    return;
+  }
+  tabs.hidden = false;
+  const isAdmin = !!S.user.admin;
+  document.querySelector('.tab[data-tab="admin"]').hidden = !isAdmin;
+  if (S.tab === 'admin' && !isAdmin) S.tab = 'study';
+  document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === S.tab)));
+  const keepScroll = $screen.querySelector('.scroll');
+  const st = keepScroll && !animate ? keepScroll.scrollTop : 0;
+  const active = document.activeElement && document.activeElement.id;
+  $screen.innerHTML = '';
+  const v = S.tab === 'study' ? renderStudy(animate) : S.tab === 'add' ? renderAdd() : S.tab === 'admin' ? renderAdmin() : renderList();
+  [].concat(v).forEach((n) => n && $screen.append(n));
+  const sc = $screen.querySelector('.scroll'); if (sc && st) sc.scrollTop = st;
+  if (active) { const el = document.getElementById(active); if (el && el.tagName !== 'BUTTON') { el.focus({ preventScroll: true }); if (el.setSelectionRange && el.value) { try { const n = el.value.length; el.setSelectionRange(n, n); } catch (e) {} } } }
+}
+document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => go(t.dataset.tab)));
+document.addEventListener('keydown', (e) => {
+  if (!S.user || S.authOverlay || S.tab !== 'study' || !S.current || $layer.firstChild || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (e.key === 'o' || e.key === 'ArrowLeft') answer(true);
+  else if (e.key === 'x' || e.key === 'ArrowRight') answer(false);
+  else if (e.key === ' ') { e.preventDefault(); S.revealed = !S.revealed; render(); }
+});
+
+if ('serviceWorker' in navigator) {
+  // 새 버전이 설치되면 한 번 자동으로 새로고침 (GitHub에 파일을 바꿔 올리면 앱이 스스로 업데이트됨)
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController && !reloaded) { reloaded = true; location.reload(); } });
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').then((r) => r.update()).catch(() => {}); });
+  // 앱이 뜬 뒤 여유가 생기면 기기 안 인식 엔진(약 12MB)을 뒤에서 받아 둠 (처음 설치를 가볍게, 오프라인 인식은 그대로)
+  navigator.serviceWorker.ready.then((r) => setTimeout(() => { try { if (r.active) r.active.postMessage('warm-ocr'); } catch (e) {} }, 8000)).catch(() => {});
+}
+(async function boot() {
+  render();
+  initClaude();
+  await Store.init();
+  try { S.users = await Store.users(); } catch (e) { S.users = []; }
+  if (!S.users.length && Store.mode === 'idb') {
+    // 기본 저장소에 계정이 없으면 예비 사본(또는 예전 임시 저장소)에서 되살림
+    const back = Store.readMirror('toeic-voca-m-users').concat(Store.readMirror('toeic-voca-users'));
+    const seen = new Set();
+    for (const u of back) { if (u && u.id && u.hash && !seen.has(u.id)) { seen.add(u.id); await Store.putUser(u).catch(() => {}); } }
+    if (seen.size) { S.users = await Store.users(); S.recovered = true; }
+  }
+  Store._users = S.users; Store.mirrorUsers(S.users);
+  S.auth.admin.unlocked = !!(await Store.getMeta('admin'));
+  let sid = await Store.getMeta('session');
+  if (!sid) { try { sid = localStorage.getItem('toeic-voca-session'); } catch (e) {} }
+  const me = S.users.find((u) => u.id === sid);
+  if (me) { await enterApp(me); } else { render(); }      // 자동 로그인 / 첫 화면 로그인
+  if (Store.mode === 'memory') showWarn('이 화면에서는 기기에 저장할 수 없어요. Safari에서 열어 주세요.');
+  else if (Store.mode === 'local') showWarn('간이 저장소를 쓰고 있어요. 단어장 메뉴에서 백업을 가끔 내보내 주세요.');
+  if (S.user) render(true);
+})();
+</script>
+
+</body>
+</html>
